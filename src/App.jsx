@@ -4,6 +4,16 @@ import translations from "./translations";
 import BodySelector from "./BodySelector";
 import { savePainRecord } from "./lib/supabase";
 
+// ─── Pain type videos ────────────────────────────────────────
+import vid_dull_foggy      from "./assets/videos/dull_foggy.mp4";
+import vid_dizzy           from "./assets/videos/dizzy.mp4";
+import vid_splitting       from "./assets/videos/splitting.mp4";
+import vid_squeezing       from "./assets/videos/squeezing.mp4";
+import vid_throbbing       from "./assets/videos/throbbing.mp4";
+import vid_heavy           from "./assets/videos/heavy.mp4";
+import vid_aching_stabbing from "./assets/videos/aching_stabbing.mp4";
+import vid_cold_sharp      from "./assets/videos/cold_sharp.mp4";
+
 function emptyEntry() {
   return { location: [], painTypes: [], intensity: 5, onset: null };
 }
@@ -36,20 +46,23 @@ function ProgressBar({ step, total, label }) {
   );
 }
 
-// ─── Pain Types ──────────────────────────────────────────────
+// ─── Pain Types (8개, 영상 포함) ─────────────────────────────
 const PAIN_TYPES = [
-  { id: "throbbing", color: "#DC2626", bg: "#FEF2F2", border: "#FECACA" },
-  { id: "stabbing",  color: "#9333EA", bg: "#FAF5FF", border: "#E9D5FF" },
-  { id: "electric",  color: "#2563EB", bg: "#EFF6FF", border: "#BFDBFE" },
-  { id: "pressure",  color: "#7C3AED", bg: "#F5F3FF", border: "#DDD6FE" },
-  { id: "burning",   color: "#EA580C", bg: "#FFF7ED", border: "#FED7AA" },
-  { id: "hollow",    color: "#6B7280", bg: "#F9FAFB", border: "#E5E7EB" },
+  { id: "dull_foggy",      color: "#6B7280", bg: "#F9FAFB", border: "#E5E7EB", video: vid_dull_foggy      },
+  { id: "dizzy",           color: "#8B5CF6", bg: "#EDE9FE", border: "#C4B5FD", video: vid_dizzy           },
+  { id: "splitting",       color: "#B91C1C", bg: "#FFF1F1", border: "#FCA5A5", video: vid_splitting       },
+  { id: "squeezing",       color: "#7C3AED", bg: "#F5F3FF", border: "#DDD6FE", video: vid_squeezing       },
+  { id: "throbbing",       color: "#DC2626", bg: "#FEF2F2", border: "#FECACA", video: vid_throbbing       },
+  { id: "heavy",           color: "#374151", bg: "#F3F4F6", border: "#D1D5DB", video: vid_heavy           },
+  { id: "aching_stabbing", color: "#EA580C", bg: "#FFF7ED", border: "#FED7AA", video: vid_aching_stabbing },
+  { id: "cold_sharp",      color: "#0891B2", bg: "#ECFEFF", border: "#A5F3FC", video: vid_cold_sharp      },
 ];
 
 // ─── Pain Type Icons ─────────────────────────────────────────
-function PainTypeIcon({ id, color, selected, size = 52 }) {
+function PainTypeIcon({ id, color, selected, size = 44 }) {
   const dim = selected ? undefined : 0.38;
 
+  // 욱신거리는 통증 — heartbeat ripple
   if (id === "throbbing") {
     const ripple = (delay) => selected ? {
       animation: `throb-ripple 1.1s ease-out ${delay}s infinite`,
@@ -68,6 +81,7 @@ function PainTypeIcon({ id, color, selected, size = 52 }) {
     );
   }
 
+  // 찌르는 통증 — sharp star burst
   if (id === "stabbing") {
     return (
       <svg viewBox="0 0 56 56" width={size} height={size}>
@@ -79,42 +93,103 @@ function PainTypeIcon({ id, color, selected, size = 52 }) {
     );
   }
 
-  if (id === "electric") {
+  // 깨질 듯한 통증 — circle with radiating cracks
+  if (id === "splitting") {
     return (
       <svg viewBox="0 0 56 56" width={size} height={size}>
-        <polygon points="36,2 20,30 29,30 18,54 38,26 29,26" fill={color} style={{ opacity: dim }} />
+        <circle cx="28" cy="28" r="18" fill={color} style={{ opacity: selected ? 0.15 : 0.07 }} />
+        <path d="M28,10 L24,22 L30,26 L20,46" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" style={{ opacity: dim }} />
+        <path d="M28,10 L32,20 L26,24 L36,46" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" style={{ opacity: dim }} />
+        <path d="M28,26 L14,32 L16,38" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" style={{ opacity: dim }} />
+        <path d="M28,26 L42,32 L40,38" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" style={{ opacity: dim }} />
+        <circle cx="28" cy="26" r="3" fill={color} style={{ opacity: dim }} />
       </svg>
     );
   }
 
-  if (id === "pressure") {
+  // 조이는 통증 — arrows pressing inward from all sides
+  if (id === "squeezing") {
     return (
       <svg viewBox="0 0 56 56" width={size} height={size}>
-        <circle cx="28" cy="28" r="9" fill={color} style={{ opacity: dim }} />
-        <polygon points="2,28 13,21 13,25.5 21,25.5 21,30.5 13,30.5 13,35"  fill={color} style={{ opacity: dim }} />
-        <polygon points="54,28 43,21 43,25.5 35,25.5 35,30.5 43,30.5 43,35" fill={color} style={{ opacity: dim }} />
+        <polygon points="2,28 14,22 14,26 24,26 24,30 14,30 14,34"  fill={color} style={{ opacity: dim }} />
+        <polygon points="54,28 42,22 42,26 32,26 32,30 42,30 42,34" fill={color} style={{ opacity: dim }} />
+        <polygon points="28,2 22,14 26,14 26,24 30,24 30,14 34,14"  fill={color} style={{ opacity: dim }} />
+        <polygon points="28,54 22,42 26,42 26,32 30,32 30,42 34,42" fill={color} style={{ opacity: dim }} />
+        <circle cx="28" cy="28" r="4" fill={color} style={{ opacity: dim }} />
       </svg>
     );
   }
 
-  if (id === "burning") {
+  // 무거운 통증 — downward weight arrow
+  if (id === "heavy") {
     return (
       <svg viewBox="0 0 56 56" width={size} height={size}>
-        <path
-          d="M28,54 C16,52 10,44 12,36 C12,27 18,20 20,14 C21,8 22,4 22,4 C25,11 23,18 27,22 C28,15 31,9 36,5 C37,14 33,20 37,28 C41,21 43,16 43,16 C46,24 46,32 44,38 C42,48 36,54 28,54 Z"
-          fill={color} style={{ opacity: dim }}
-        />
+        <rect x="14" y="9" width="28" height="8" rx="4" fill={color} style={{ opacity: dim }} />
+        <rect x="24" y="17" width="8" height="16" fill={color} style={{ opacity: dim }} />
+        <polygon points="28,50 12,33 44,33" fill={color} style={{ opacity: dim }} />
       </svg>
     );
   }
 
-  if (id === "hollow") {
+  // 쑤시는 통증 — wavy radiating lines
+  if (id === "aching") {
     return (
       <svg viewBox="0 0 56 56" width={size} height={size}>
-        <circle cx="28" cy="28" r="24" fill={color} style={{ opacity: selected ? 0.11 : 0.05 }} />
-        <circle cx="28" cy="28" r="17" fill={color} style={{ opacity: selected ? 0.24 : 0.09 }} />
-        <circle cx="28" cy="28" r="11" fill={color} style={{ opacity: selected ? 0.55 : 0.18 }} />
-        <circle cx="28" cy="28" r="5"  fill={color} style={{ opacity: selected ? 0.90 : 0.30 }} />
+        <circle cx="28" cy="28" r="5" fill={color} style={{ opacity: dim }} />
+        <path d="M28,22 Q32,18 28,14 Q24,10 28,6"   fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" style={{ opacity: dim }} />
+        <path d="M28,34 Q32,38 28,42 Q24,46 28,50"  fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" style={{ opacity: dim }} />
+        <path d="M22,28 Q18,32 14,28 Q10,24 6,28"   fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" style={{ opacity: dim }} />
+        <path d="M34,28 Q38,32 42,28 Q46,24 50,28"  fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" style={{ opacity: dim }} />
+      </svg>
+    );
+  }
+
+  // 시린 통증 — snowflake
+  if (id === "cold_sharp") {
+    return (
+      <svg viewBox="0 0 56 56" width={size} height={size}>
+        <line x1="28" y1="6"  x2="28" y2="50" stroke={color} strokeWidth="2.5" strokeLinecap="round" style={{ opacity: dim }} />
+        <line x1="6"  y1="28" x2="50" y2="28" stroke={color} strokeWidth="2.5" strokeLinecap="round" style={{ opacity: dim }} />
+        <line x1="12" y1="12" x2="44" y2="44" stroke={color} strokeWidth="2.5" strokeLinecap="round" style={{ opacity: dim }} />
+        <line x1="44" y1="12" x2="12" y2="44" stroke={color} strokeWidth="2.5" strokeLinecap="round" style={{ opacity: dim }} />
+        <line x1="28" y1="16" x2="22" y2="12" stroke={color} strokeWidth="1.5" strokeLinecap="round" style={{ opacity: dim }} />
+        <line x1="28" y1="16" x2="34" y2="12" stroke={color} strokeWidth="1.5" strokeLinecap="round" style={{ opacity: dim }} />
+        <line x1="28" y1="40" x2="22" y2="44" stroke={color} strokeWidth="1.5" strokeLinecap="round" style={{ opacity: dim }} />
+        <line x1="28" y1="40" x2="34" y2="44" stroke={color} strokeWidth="1.5" strokeLinecap="round" style={{ opacity: dim }} />
+        <line x1="16" y1="28" x2="12" y2="22" stroke={color} strokeWidth="1.5" strokeLinecap="round" style={{ opacity: dim }} />
+        <line x1="16" y1="28" x2="12" y2="34" stroke={color} strokeWidth="1.5" strokeLinecap="round" style={{ opacity: dim }} />
+        <line x1="40" y1="28" x2="44" y2="22" stroke={color} strokeWidth="1.5" strokeLinecap="round" style={{ opacity: dim }} />
+        <line x1="40" y1="28" x2="44" y2="34" stroke={color} strokeWidth="1.5" strokeLinecap="round" style={{ opacity: dim }} />
+        <circle cx="28" cy="28" r="3" fill={color} style={{ opacity: dim }} />
+      </svg>
+    );
+  }
+
+  // 띵한 통증 — foggy layered ellipses
+  if (id === "dull_foggy") {
+    return (
+      <svg viewBox="0 0 56 56" width={size} height={size}>
+        <ellipse cx="27" cy="28" rx="18" ry="13" fill={color} style={{ opacity: selected ? 0.18 : 0.07 }} />
+        <ellipse cx="29" cy="27" rx="14" ry="10" fill={color} style={{ opacity: selected ? 0.28 : 0.11 }} />
+        <ellipse cx="28" cy="28" rx="9"  ry="7"  fill={color} style={{ opacity: selected ? 0.50 : 0.20 }} />
+        <ellipse cx="28" cy="28" rx="5"  ry="4"  fill={color} style={{ opacity: selected ? 0.78 : 0.32 }} />
+        <circle cx="18" cy="20" r="2"   fill={color} style={{ opacity: selected ? 0.55 : 0.18 }} />
+        <circle cx="38" cy="22" r="1.5" fill={color} style={{ opacity: selected ? 0.45 : 0.15 }} />
+        <circle cx="20" cy="38" r="1.5" fill={color} style={{ opacity: selected ? 0.40 : 0.12 }} />
+      </svg>
+    );
+  }
+
+  // 어지러운 통증 — circular spinning arrow
+  if (id === "dizzy") {
+    return (
+      <svg viewBox="0 0 56 56" width={size} height={size}>
+        <path d="M28,8 A20,20 0 1,1 8,28" fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" style={{ opacity: dim }} />
+        <polygon points="8,28 2,20 16,18" fill={color} style={{ opacity: dim }} />
+        <circle cx="28" cy="28" r="3.5" fill={color} style={{ opacity: dim }} />
+        <circle cx="28" cy="19" r="2"   fill={color} style={{ opacity: selected ? 0.70 : 0.15 }} />
+        <circle cx="37" cy="28" r="2"   fill={color} style={{ opacity: selected ? 0.50 : 0.12 }} />
+        <circle cx="19" cy="28" r="2"   fill={color} style={{ opacity: selected ? 0.50 : 0.12 }} />
       </svg>
     );
   }
@@ -359,7 +434,7 @@ function PainTypeSelector({ onNext, onBack, painData, setPainData, t }) {
 
       <div style={{
         display: "grid", gridTemplateColumns: "1fr 1fr",
-        gap: "10px", padding: "12px 20px", flex: 1, overflowY: "auto",
+        gap: "10px", padding: "10px 16px", flex: 1, overflowY: "auto",
       }}>
         {PAIN_TYPES.map(type => {
           const sel = selected.includes(type.id);
@@ -368,21 +443,33 @@ function PainTypeSelector({ onNext, onBack, painData, setPainData, t }) {
               key={type.id}
               onClick={() => handleToggle(type.id)}
               style={{
-                borderRadius: "16px", padding: "16px 10px 14px",
+                borderRadius: "14px",
                 border: "2.5px solid",
                 borderColor: sel ? type.color : type.border,
                 backgroundColor: sel ? type.bg : "#fff",
-                cursor: "pointer", textAlign: "center",
+                cursor: "pointer",
                 transition: "all 0.15s ease",
-                boxShadow: sel ? `0 4px 16px ${type.color}28` : "none",
+                boxShadow: sel ? `0 4px 14px ${type.color}28` : "none",
+                overflow: "hidden",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "60px", marginBottom: "8px" }}>
-                <div className={sel ? `pain-icon-${type.id}` : ""}>
-                  <PainTypeIcon id={type.id} color={type.color} selected={sel} />
-                </div>
+              <div style={{ position: "relative" }}>
+                <video
+                  autoPlay loop muted playsInline
+                  style={{ width: "100%", height: "110px", objectFit: "cover", display: "block" }}
+                >
+                  <source src={type.video} type="video/mp4" />
+                </video>
+                {sel && (
+                  <div style={{ position: "absolute", inset: 0, backgroundColor: `${type.color}30` }} />
+                )}
               </div>
-              <div style={{ fontWeight: "700", fontSize: "14px", color: sel ? type.color : "#374151" }}>
+              <div style={{
+                padding: "8px 6px",
+                fontWeight: "700", fontSize: "12px",
+                color: sel ? type.color : "#374151",
+                textAlign: "center",
+              }}>
                 {t[type.id]}
               </div>
             </div>
@@ -392,7 +479,8 @@ function PainTypeSelector({ onNext, onBack, painData, setPainData, t }) {
 
       <div style={{ padding: "0 20px 20px", flexShrink: 0 }}>
         <div style={{
-          minHeight: "28px", fontSize: "13px", fontWeight: "600",
+          height: "20px", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis",
+          fontSize: "13px", fontWeight: "600",
           color: selected.length > 0 ? "#6B21A8" : "#BBB", marginBottom: "10px",
         }}>
           {selected.length > 0 ? `✓ ${selected.map(id => t[id]).join(", ")}` : t.tapPainType}
@@ -743,6 +831,41 @@ function SummaryCard({ entries, currentEntry, onConsent, onBack, painPattern, ti
             ))
         }
 
+        {/* "이렇게 표현해 보세요" — timeline mode: render once using currentEntry's pain types */}
+        {isTimelineMode && (() => {
+          const pts = currentEntry.painTypes || [];
+          const locLabel = currentEntry.location?.includes("unknown")
+            ? t.unknownArea
+            : (currentEntry.location?.map(k => t[k]).join(", ") || "—");
+          if (!pts.length) return null;
+          return (
+            <div style={{
+              backgroundColor: "#F5F3FF", borderRadius: "16px",
+              padding: "16px", border: "1.5px solid #DDD6FE", marginBottom: "12px",
+            }}>
+              <div style={{ fontSize: "12px", color: "#7C3AED", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: "12px" }}>
+                💬 {t.expressionTitle}
+              </div>
+              {pts.map(pt => {
+                const expr = t.medicalExpressions?.[pt];
+                if (!expr) return null;
+                return (
+                  <div key={pt} style={{ marginBottom: "12px" }}>
+                    <div style={{ backgroundColor: "#EDE9FE", borderRadius: "10px", padding: "10px 14px", marginBottom: "8px" }}>
+                      <div style={{ fontSize: "11px", color: "#7C3AED", fontWeight: "600", marginBottom: "4px" }}>{t.medicalTerm}</div>
+                      <div style={{ fontSize: "14px", color: "#3B0764", fontWeight: "700" }}>{expr.medical}</div>
+                    </div>
+                    <div style={{ backgroundColor: "#fff", borderRadius: "10px", padding: "10px 14px", borderLeft: "4px solid #7C3AED" }}>
+                      <div style={{ fontSize: "11px", color: "#7C3AED", fontWeight: "600", marginBottom: "6px" }}>{t.koreanExpr}</div>
+                      <div style={{ fontSize: "14px", color: "#1F0A3C", lineHeight: "1.65" }}>"{expr.phrase(locLabel)}"</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()}
+
         {/* Note preview — live-updates as user types */}
         {sessionNote.length > 0 && (
           <div style={{
@@ -826,16 +949,17 @@ function SummaryCard({ entries, currentEntry, onConsent, onBack, painPattern, ti
 function DataConsentModal({ onAgree, onDecline, t }) {
   return (
     <div style={{
-      position: "fixed", inset: 0, zIndex: 1000,
-      backgroundColor: "rgba(15,0,40,0.78)",
-      display: "flex", alignItems: "flex-end",
+      position: "absolute", inset: 0, zIndex: 1000,
+      backgroundColor: "rgba(15,0,40,0.82)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      padding: "16px",
     }}>
       <div
-        className="modal-slide-up"
         style={{
-          width: "100%", maxHeight: "92vh",
-          backgroundColor: "#fff", borderRadius: "24px 24px 0 0",
+          width: "100%", maxWidth: "380px", maxHeight: "80vh",
+          backgroundColor: "#fff", borderRadius: "20px",
           display: "flex", flexDirection: "column", overflow: "hidden",
+          boxShadow: "0 24px 60px rgba(0,0,0,0.5)",
         }}
       >
         {/* Purple header */}
@@ -1364,14 +1488,16 @@ function TimelineEditor({ onNext, onBack, timelineEvents, setTimelineEvents, ses
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: "12px", fontWeight: "700", color: "#374151" }}>{dateInfos[i].full}</div>
               </div>
-              {nodes.length > 2 && (
-                <button
-                  onClick={e => { e.stopPropagation(); removeNode(i); }}
-                  style={{ background: "none", border: "none", color: "#D1D5DB", fontSize: "14px", cursor: "pointer", padding: "4px" }}
-                >
-                  ✕
-                </button>
-              )}
+              <button
+                onClick={e => { e.stopPropagation(); removeNode(i); }}
+                style={{
+                  background: "none", border: "none", fontSize: "16px", padding: "4px 6px",
+                  color: nodes.length > 2 ? "#EF4444" : "#C4B5FD",
+                  cursor: nodes.length > 2 ? "pointer" : "default",
+                }}
+              >
+                ✕
+              </button>
               <span style={{ fontSize: "16px", color: "#A78BFA" }}>›</span>
             </div>
           );
@@ -1508,11 +1634,13 @@ export default function App() {
     if (step === 2 && entries.length > 0) {
       setStep(6);
     } else if (step === 4) {
-      setStep(2); // always back to BodySelector (head detail handled inside it)
+      setStep(2);
     } else if (step === 20) {
-      setStep(4); // timeline back → PainTypeSelector
+      setStep(4);
+    } else if (step === 6 && painPattern && painPattern !== "same" && entries.length === 0) {
+      setStep(20);   // AddMore (non-same, first pass) → timeline
     } else if (step === 7 && painPattern && painPattern !== "same") {
-      setStep(20);
+      setStep(6);    // summary (non-same) → AddMore
     } else {
       setStep(p => p - 1);
     }
@@ -1533,7 +1661,7 @@ export default function App() {
     setStep(4);
   };
 
-  const handleTimelineNext = () => setStep(7);
+  const handleTimelineNext = () => setStep(6);
 
   const handleAddMore = () => {
     setEntries(prev => [...prev, currentEntry]);
@@ -1561,13 +1689,7 @@ export default function App() {
   };
 
   const restart = () => {
-    setStep(0);
-    setEntries([]);
-    setCurrentEntry(emptyEntry());
-    setPainPattern(null);
-    setTimelineEvents([]);
-    setSessionNote("");
-    setConsentGiven(null);
+    window.location.reload();
   };
 
   const handleSave = () => {
@@ -1620,6 +1742,7 @@ export default function App() {
   return (
     <div style={{
       width: "100%", height: "100%",
+      position: "relative",
       fontFamily: "'Segoe UI', system-ui, sans-serif",
       backgroundColor: "#fff",
       display: "flex", flexDirection: "column",

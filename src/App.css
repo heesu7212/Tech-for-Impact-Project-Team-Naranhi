@@ -75,12 +75,37 @@
 .head-glow      { animation: head-glow-anim 2s ease-in-out infinite; cursor: pointer; }
 .ripple-dot     { animation: ripple 1.2s ease-out infinite; }
 
-.pain-icon-stabbing  { animation: stab-burst 0.55s ease-in-out infinite; transform-origin: center; }
-.pain-icon-electric  { animation: zap-flash 0.85s ease-in-out infinite; }
-.pain-icon-pressure  { animation: press-in 1.5s ease-in-out infinite; transform-origin: center; }
-.pain-icon-burning   { animation: flame-flicker 1.1s ease-in-out infinite; transform-origin: 50% 95%; }
-/* 둔한 통증: 전체 덩어리가 천천히 균일하게 숨쉼 — 파문 없음 */
-.pain-icon-hollow    { animation: dull-breathe 3.2s ease-in-out infinite; transform-origin: center; }
+.pain-icon-stabbing   { animation: stab-burst 0.55s ease-in-out infinite; transform-origin: center; }
+.pain-icon-electric   { animation: zap-flash 0.85s ease-in-out infinite; }
+.pain-icon-pressure   { animation: press-in 1.5s ease-in-out infinite; transform-origin: center; }
+.pain-icon-burning    { animation: flame-flicker 1.1s ease-in-out infinite; transform-origin: 50% 95%; }
+.pain-icon-hollow     { animation: dull-breathe 3.2s ease-in-out infinite; transform-origin: center; }
+
+/* 새 통증 유형 애니메이션 */
+@keyframes crack-burst {
+  0%, 100% { transform: scale(1); }
+  45% { transform: scale(1.22); }
+}
+@keyframes heavy-drop {
+  0%, 100% { transform: translateY(0px); }
+  55% { transform: translateY(5px); }
+}
+@keyframes cold-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(0.92); opacity: 0.5; }
+}
+@keyframes dizzy-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.pain-icon-splitting  { animation: crack-burst 0.65s ease-in-out infinite; transform-origin: center; }
+.pain-icon-squeezing  { animation: press-in 1.3s ease-in-out infinite; transform-origin: center; }
+.pain-icon-heavy      { animation: heavy-drop 1.8s ease-in-out infinite; transform-origin: center; }
+.pain-icon-aching     { animation: slow-pulse 2.2s ease-in-out infinite; transform-origin: center; }
+.pain-icon-cold_sharp { animation: cold-pulse 1.6s ease-in-out infinite; transform-origin: center; }
+.pain-icon-dull_foggy { animation: dull-breathe 3.5s ease-in-out infinite; transform-origin: center; }
+.pain-icon-dizzy      { animation: dizzy-spin 2.5s linear infinite; transform-origin: center; }
 
 @keyframes node-pulse {
   0%, 100% { r: 10; opacity: 1; }

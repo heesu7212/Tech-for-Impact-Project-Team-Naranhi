@@ -1,6 +1,6 @@
 import { Suspense, useRef, useMemo, useEffect } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, useGLTF, Html } from "@react-three/drei";
+import { OrbitControls, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 
 const MODEL_PATH =
@@ -30,32 +30,34 @@ export const BODY_ZONES = [
   { id: "left_leg",    pos: [0.12,  -0.57,   0],    size: [0.17,  0.60,  0.14] },
 ];
 
-// ─── 10 head zone boxes ──────────────────────────────────────
+// ─── 10 head zone slabs ──────────────────────────────────────
 const HEAD_ZONES = [
-  { id: "top",          pos: [0,      0.97,   0],    size: [0.14, 0.05, 0.14] },
-  { id: "forehead",     pos: [0,      0.92,   0.09], size: [0.13, 0.06, 0.04] },
-  { id: "leftTemple",   pos: [-0.13,  0.89,   0.02], size: [0.04, 0.07, 0.07] },
-  { id: "rightTemple",  pos: [0.13,   0.89,   0.02], size: [0.04, 0.07, 0.07] },
-  { id: "leftEye",      pos: [-0.06,  0.87,   0.09], size: [0.05, 0.04, 0.03] },
-  { id: "rightEye",     pos: [0.06,   0.87,   0.09], size: [0.05, 0.04, 0.03] },
-  { id: "leftCheek",    pos: [-0.08,  0.82,   0.08], size: [0.05, 0.05, 0.04] },
-  { id: "rightCheek",   pos: [0.08,   0.82,   0.08], size: [0.05, 0.05, 0.04] },
-  { id: "leftSide",     pos: [-0.13,  0.84,   0],    size: [0.04, 0.09, 0.09] },
-  { id: "rightSide",    pos: [0.13,   0.84,   0],    size: [0.04, 0.09, 0.09] },
+  { id: "top",         pos: [0,       0.985,  0    ], size: [0.19,  0.034, 0.19 ] },
+  { id: "forehead",    pos: [0,       0.924,  0.088], size: [0.15,  0.075, 0.034] },
+  { id: "leftTemple",  pos: [-0.118,  0.893,  0.028], size: [0.034, 0.088, 0.098] },
+  { id: "rightTemple", pos: [ 0.118,  0.893,  0.028], size: [0.034, 0.088, 0.098] },
+  { id: "leftEye",     pos: [-0.068,  0.876,  0.092], size: [0.066, 0.042, 0.028] },
+  { id: "rightEye",    pos: [ 0.068,  0.876,  0.092], size: [0.066, 0.042, 0.028] },
+  { id: "leftCheek",   pos: [-0.090,  0.820,  0.088], size: [0.068, 0.065, 0.028] },
+  { id: "rightCheek",  pos: [ 0.090,  0.820,  0.088], size: [0.068, 0.065, 0.028] },
+  { id: "leftSide",    pos: [-0.118,  0.845,  0.015], size: [0.034, 0.108, 0.108] },
+  { id: "rightSide",   pos: [ 0.118,  0.845,  0.015], size: [0.034, 0.108, 0.108] },
 ];
 
-const LABEL_OFFSET = {
-  top:          [0,     0.06,  0],
-  forehead:     [0.17,  0.02,  0],
-  leftTemple:   [-0.17, 0,     0],
-  rightTemple:  [0.17,  0,     0],
-  leftEye:      [-0.15, 0,     0],
-  rightEye:     [0.15,  0,     0],
-  leftCheek:    [-0.15, 0,     0],
-  rightCheek:   [0.15,  0,     0],
-  leftSide:     [-0.18, 0,     0],
-  rightSide:    [0.18,  0,     0],
+// ─── Head zone colours ────────────────────────────────────────
+const ZONE_COLORS = {
+  top:          "#7C3AED",
+  forehead:     "#2563EB",
+  leftTemple:   "#D97706",
+  rightTemple:  "#D97706",
+  leftEye:      "#DC2626",
+  rightEye:     "#DC2626",
+  leftCheek:    "#059669",
+  rightCheek:   "#059669",
+  leftSide:     "#DB2777",
+  rightSide:    "#DB2777",
 };
+export { ZONE_COLORS };
 
 // ─── Model ───────────────────────────────────────────────────
 function BodyModel() {
@@ -86,10 +88,9 @@ function useTapHandler(onTap) {
   };
 }
 
-// ─── Body zone (visible hint glow + invisible tap target) ────
+// ─── Body zone ────────────────────────────────────────────────
 function BodyZone({ zone, active, onTap }) {
   const handlers = useTapHandler(onTap);
-  // Show a faint outline so users can see where to tap
   return (
     <mesh position={zone.pos} {...handlers}>
       <boxGeometry args={zone.size} />
@@ -104,47 +105,33 @@ function BodyZone({ zone, active, onTap }) {
   );
 }
 
-// ─── Head zone with floating label ───────────────────────────
-function HeadZone({ zone, selected, onToggle, t }) {
-  const handlers = useTapHandler(() => onToggle(zone.id));
-  const off = LABEL_OFFSET[zone.id] || [0.14, 0, 0];
-  const labelPos = [zone.pos[0] + off[0], zone.pos[1] + off[1], zone.pos[2] + off[2]];
-
+// ─── Head zone ────────────────────────────────────────────────
+function HeadZone({ zone, selected, onToggle, onHover }) {
+  const color = ZONE_COLORS[zone.id] || "#7C3AED";
+  const handlers = useTapHandler(() => {
+    onToggle(zone.id);
+    onHover(zone.id);
+  });
   return (
-    <group>
-      <mesh position={zone.pos} {...handlers}>
-        <boxGeometry args={zone.size} />
-        <meshStandardMaterial
-          color="#7C3AED"
-          transparent
-          opacity={selected ? 0.55 : 0.22}
-          depthWrite={false}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-      <Html position={labelPos} center distanceFactor={1.2}>
-        <div style={{
-          background: selected ? "#6B21A8" : "rgba(20,5,48,0.82)",
-          color: "#fff",
-          padding: "2px 7px",
-          borderRadius: "8px",
-          fontSize: "10px",
-          fontWeight: "700",
-          whiteSpace: "nowrap",
-          pointerEvents: "none",
-          border: selected ? "1.5px solid #A78BFA" : "1px solid rgba(167,139,250,0.3)",
-          userSelect: "none",
-        }}>
-          {t[zone.id] || zone.id}
-        </div>
-      </Html>
-    </group>
+    <mesh
+      position={zone.pos}
+      {...handlers}
+      onPointerEnter={() => onHover(zone.id)}
+      onPointerLeave={() => onHover(null)}
+    >
+      <boxGeometry args={zone.size} />
+      <meshStandardMaterial
+        color={color}
+        transparent
+        opacity={selected ? 0.65 : 0.32}
+        depthWrite={false}
+        side={THREE.DoubleSide}
+      />
+    </mesh>
   );
 }
 
 // ─── Camera animator ─────────────────────────────────────────
-// ONLY runs lerp/slerp when an actual mode transition is in progress.
-// When idle it is a complete no-op so it cannot fight OrbitControls.
 function CameraAnimator({ mode, orbitRef, onComplete }) {
   const { camera } = useThree();
   const dummy = useMemo(() => new THREE.Object3D(), []);
@@ -161,18 +148,17 @@ function CameraAnimator({ mode, orbitRef, onComplete }) {
   }, [mode, orbitRef]);
 
   useFrame(() => {
-    // ← critical: bail out when not animating so nothing fights OrbitControls
     if (!isAnimating.current || !orbitRef.current) return;
 
     const preset = mode === "head" ? HEAD_CAM : BODY_CAM;
 
-    camera.position.lerp(preset.pos, 0.07);
+    camera.position.lerp(preset.pos, 0.18);
 
     dummy.position.copy(preset.pos);
     dummy.lookAt(preset.target);
-    camera.quaternion.slerp(dummy.quaternion, 0.09);
+    camera.quaternion.slerp(dummy.quaternion, 0.18);
 
-    if (camera.position.distanceTo(preset.pos) < 0.025) {
+    if (camera.position.distanceTo(preset.pos) < 0.012) {
       isAnimating.current = false;
       camera.position.copy(preset.pos);
       camera.quaternion.copy(dummy.quaternion);
@@ -190,7 +176,11 @@ function CameraAnimator({ mode, orbitRef, onComplete }) {
 }
 
 // ─── Scene ───────────────────────────────────────────────────
-function Scene({ mode, activeBodyZone, onBodyZoneTap, selectedHeadZones, onHeadZoneToggle, onCameraComplete, t }) {
+function Scene({
+  mode, activeBodyZone, onBodyZoneTap,
+  selectedHeadZones, onHeadZoneToggle, onHeadZoneHover,
+  onCameraComplete,
+}) {
   const orbitRef = useRef();
 
   return (
@@ -218,7 +208,7 @@ function Scene({ mode, activeBodyZone, onBodyZoneTap, selectedHeadZones, onHeadZ
           zone={zone}
           selected={selectedHeadZones.includes(zone.id)}
           onToggle={onHeadZoneToggle}
-          t={t}
+          onHover={onHeadZoneHover}
         />
       ))}
 
@@ -247,6 +237,7 @@ export default function BodySelector3D({
   onBodyZoneTap,
   selectedHeadZones,
   onHeadZoneToggle,
+  onHeadZoneHover,
   onCameraComplete,
   t,
 }) {
@@ -265,8 +256,8 @@ export default function BodySelector3D({
         onBodyZoneTap={onBodyZoneTap}
         selectedHeadZones={selectedHeadZones || []}
         onHeadZoneToggle={onHeadZoneToggle}
+        onHeadZoneHover={onHeadZoneHover || (() => {})}
         onCameraComplete={onCameraComplete}
-        t={t}
       />
     </Canvas>
   );
