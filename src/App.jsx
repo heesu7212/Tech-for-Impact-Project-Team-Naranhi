@@ -1193,24 +1193,6 @@ const GENDER_OPTIONS = [
   { key: "female" },
 ];
 
-function GenderIcon({ type, selected }) {
-  const c = selected ? "#6B21A8" : "#A78BFA";
-  // Male: circle head + broad shoulder block
-  if (type === "male") return (
-    <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
-      <circle cx="19" cy="11" r="7" fill={c} />
-      <rect x="9" y="20" width="20" height="16" rx="4" fill={c} />
-    </svg>
-  );
-  // Female: circle head + trapezoid body (wider at bottom)
-  return (
-    <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
-      <circle cx="19" cy="11" r="7" fill={c} />
-      <path d="M12 21 Q11 36 6 36 L32 36 Q27 36 26 21 Z" fill={c} />
-    </svg>
-  );
-}
-
 function PainSetupScreen({ onNext, onBack, painData, setPainData, onPatternChosen, gender, setGender, t }) {
   const { onset } = painData;
   const [pattern, setPattern] = useState(null);
@@ -1243,7 +1225,9 @@ function PainSetupScreen({ onNext, onBack, painData, setPainData, onPatternChose
         <div style={{ fontSize: "13px", fontWeight: "700", color: "#374151", marginBottom: "10px" }}>
           {t.genderLabel}
         </div>
-        <div style={{ display: "flex", gap: "8px" }}>
+        <div style={{
+          display: "flex", background: "#F3F0FF", borderRadius: "14px", padding: "4px", gap: "4px",
+        }}>
           {GENDER_OPTIONS.map(g => {
             const sel = gender === g.key;
             return (
@@ -1251,19 +1235,16 @@ function PainSetupScreen({ onNext, onBack, painData, setPainData, onPatternChose
                 key={g.key}
                 onClick={() => setGender(g.key)}
                 style={{
-                  flex: 1, padding: "14px 6px", borderRadius: "14px",
-                  border: `2px solid ${sel ? "#6B21A8" : "#E9D5FF"}`,
-                  backgroundColor: sel ? "#EDE9FE" : "#FDFBFF",
-                  cursor: "pointer", textAlign: "center",
-                  transition: "all 0.15s",
-                  boxShadow: sel ? "0 4px 14px rgba(107,33,168,0.2)" : "none",
-                  display: "flex", flexDirection: "column", alignItems: "center", gap: "6px",
+                  flex: 1, padding: "12px 0",
+                  borderRadius: "10px", border: "none",
+                  backgroundColor: sel ? "#6B21A8" : "transparent",
+                  color: sel ? "#fff" : "#7C3AED",
+                  fontSize: "15px", fontWeight: "700",
+                  cursor: "pointer", transition: "all 0.15s",
+                  boxShadow: sel ? "0 2px 8px rgba(107,33,168,0.3)" : "none",
                 }}
               >
-                <GenderIcon type={g.key} selected={sel} />
-                <span style={{ fontSize: "13px", fontWeight: "700", color: sel ? "#6B21A8" : "#374151" }}>
-                  {t[`gender_${g.key}`]}
-                </span>
+                {t[`gender_${g.key}`]}
               </button>
             );
           })}
@@ -1501,7 +1482,11 @@ function TimelineEditor({ onNext, onBack, timelineEvents, setTimelineEvents, ses
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      <div style={{ padding: "16px 20px 4px", flexShrink: 0 }}>
+
+      {/* ── 스크롤 영역: 헤더 + 강도 표시 + 그래프 + 노드 목록 ── */}
+      <div style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
+
+      <div style={{ padding: "16px 20px 4px" }}>
         <button
           onClick={onBack}
           style={{ background: "none", border: "none", color: "#6B21A8", fontSize: "15px", cursor: "pointer", fontWeight: "600", padding: "4px 0", marginBottom: "8px", display: "block" }}
@@ -1609,8 +1594,8 @@ function TimelineEditor({ onNext, onBack, timelineEvents, setTimelineEvents, ses
         </div>
       </div>
 
-      {/* Node list — draggable for reordering */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "8px 16px 0" }}>
+      {/* Node list — 내부 스크롤 없음, 전체 페이지에서 스크롤 */}
+      <div style={{ padding: "8px 16px 16px" }}>
         {nodes.map((node, i) => {
           const col = nodeColor(node.intensity);
           return (
@@ -1658,8 +1643,14 @@ function TimelineEditor({ onNext, onBack, timelineEvents, setTimelineEvents, ses
         })}
       </div>
 
-      {/* Add node + Next */}
-      <div style={{ padding: "8px 16px 16px", flexShrink: 0, display: "flex", flexDirection: "column", gap: "8px" }}>
+      </div>{/* ── 스크롤 영역 끝 ── */}
+
+      {/* Add node + Next — 하단 고정 */}
+      <div style={{
+        padding: "8px 16px 16px", flexShrink: 0,
+        display: "flex", flexDirection: "column", gap: "8px",
+        borderTop: "1px solid #F3E8FF", backgroundColor: "#fff",
+      }}>
         {nodes.length < 5 && (
           <button
             onClick={addNode}
