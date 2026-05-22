@@ -418,66 +418,73 @@ function PainTypeSelector({ onNext, onBack, painData, setPainData, t }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      <div style={{ padding: "16px 20px 4px", flexShrink: 0 }}>
-        <button
-          onClick={onBack}
-          style={{ background: "none", border: "none", color: "#6B21A8", fontSize: "15px", cursor: "pointer", fontWeight: "600", padding: "4px 0", marginBottom: "8px", display: "block" }}
-        >
-          {t.back}
-        </button>
-        <ProgressBar step={3} total={5} label={t.stepType} />
-        <h2 style={{ margin: "0 0 4px", color: "#1F0A3C", fontSize: "20px", fontWeight: "700" }}>
-          {t.whatKindOfPain}
-        </h2>
-        <p style={{ margin: 0, color: "#888", fontSize: "13px" }}>{t.selectType}</p>
+      {/* 스크롤 영역: 헤더 + 그리드 */}
+      <div style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
+        <div style={{ padding: "16px 20px 4px" }}>
+          <button
+            onClick={onBack}
+            style={{ background: "none", border: "none", color: "#6B21A8", fontSize: "15px", cursor: "pointer", fontWeight: "600", padding: "4px 0", marginBottom: "8px", display: "block" }}
+          >
+            {t.back}
+          </button>
+          <ProgressBar step={3} total={5} label={t.stepType} />
+          <h2 style={{ margin: "0 0 4px", color: "#1F0A3C", fontSize: "20px", fontWeight: "700" }}>
+            {t.whatKindOfPain}
+          </h2>
+          <p style={{ margin: 0, color: "#888", fontSize: "13px" }}>{t.selectType}</p>
+        </div>
+
+        <div style={{
+          display: "grid", gridTemplateColumns: "1fr 1fr",
+          gap: "10px", padding: "10px 16px 16px",
+        }}>
+          {PAIN_TYPES.map(type => {
+            const sel = selected.includes(type.id);
+            return (
+              <div
+                key={type.id}
+                onClick={() => handleToggle(type.id)}
+                style={{
+                  borderRadius: "14px",
+                  border: "2.5px solid",
+                  borderColor: sel ? type.color : type.border,
+                  backgroundColor: sel ? type.bg : "#fff",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                  boxShadow: sel ? `0 4px 14px ${type.color}28` : "none",
+                  overflow: "hidden",
+                }}
+              >
+                <div style={{ position: "relative" }}>
+                  <video
+                    autoPlay loop muted playsInline
+                    style={{ width: "100%", aspectRatio: "4/3", objectFit: "cover", display: "block" }}
+                  >
+                    <source src={type.video} type="video/mp4" />
+                  </video>
+                  {sel && (
+                    <div style={{ position: "absolute", inset: 0, backgroundColor: `${type.color}30` }} />
+                  )}
+                </div>
+                <div style={{
+                  padding: "8px 6px",
+                  fontWeight: "700", fontSize: "12px",
+                  color: sel ? type.color : "#374151",
+                  textAlign: "center",
+                }}>
+                  {t[type.id]}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
+      {/* 다음 버튼 — 항상 하단 고정 */}
       <div style={{
-        display: "grid", gridTemplateColumns: "1fr 1fr",
-        gap: "10px", padding: "10px 16px", flex: 1, overflowY: "auto",
+        padding: "10px 20px 20px", flexShrink: 0,
+        borderTop: "1px solid #F3E8FF", backgroundColor: "#fff",
       }}>
-        {PAIN_TYPES.map(type => {
-          const sel = selected.includes(type.id);
-          return (
-            <div
-              key={type.id}
-              onClick={() => handleToggle(type.id)}
-              style={{
-                borderRadius: "14px",
-                border: "2.5px solid",
-                borderColor: sel ? type.color : type.border,
-                backgroundColor: sel ? type.bg : "#fff",
-                cursor: "pointer",
-                transition: "all 0.15s ease",
-                boxShadow: sel ? `0 4px 14px ${type.color}28` : "none",
-                overflow: "hidden",
-              }}
-            >
-              <div style={{ position: "relative" }}>
-                <video
-                  autoPlay loop muted playsInline
-                  style={{ width: "100%", height: "110px", objectFit: "cover", display: "block" }}
-                >
-                  <source src={type.video} type="video/mp4" />
-                </video>
-                {sel && (
-                  <div style={{ position: "absolute", inset: 0, backgroundColor: `${type.color}30` }} />
-                )}
-              </div>
-              <div style={{
-                padding: "8px 6px",
-                fontWeight: "700", fontSize: "12px",
-                color: sel ? type.color : "#374151",
-                textAlign: "center",
-              }}>
-                {t[type.id]}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <div style={{ padding: "0 20px 20px", flexShrink: 0 }}>
         <div style={{
           height: "20px", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis",
           fontSize: "13px", fontWeight: "600",
