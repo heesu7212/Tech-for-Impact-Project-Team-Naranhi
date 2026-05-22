@@ -194,6 +194,21 @@ function PainTypeIcon({ id, color, selected, size = 44 }) {
     );
   }
 
+  // 쑤시고 찌르는 통증 — wavy lines (aching) + sharp spike (stabbing)
+  if (id === "aching_stabbing") {
+    return (
+      <svg viewBox="0 0 56 56" width={size} height={size}>
+        <circle cx="28" cy="28" r="5" fill={color} style={{ opacity: dim }} />
+        <path d="M28,22 Q32,18 28,14 Q24,10 28,6"  fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" style={{ opacity: dim }} />
+        <path d="M28,34 Q32,38 28,42 Q24,46 28,50" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" style={{ opacity: dim }} />
+        <path d="M22,28 Q18,32 14,28 Q10,24 6,28"  fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" style={{ opacity: dim }} />
+        <path d="M34,28 Q38,32 42,28 Q46,24 50,28" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" style={{ opacity: dim }} />
+        <line x1="33" y1="23" x2="46" y2="7" stroke={color} strokeWidth="2.5" strokeLinecap="round" style={{ opacity: dim }} />
+        <polygon points="46,7 39,13 35,9" fill={color} style={{ opacity: dim }} />
+      </svg>
+    );
+  }
+
   return null;
 }
 
