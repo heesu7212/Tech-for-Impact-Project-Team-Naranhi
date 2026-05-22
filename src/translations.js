@@ -73,7 +73,6 @@ const translations = {
     genderLabel: "Gender",
     gender_male: "Male",
     gender_female: "Female",
-    gender_other: "Other",
 
     // Onset
     whenDidItStart: "When did the pain start?",
@@ -274,7 +273,6 @@ const translations = {
     genderLabel: "성별",
     gender_male: "남성",
     gender_female: "여성",
-    gender_other: "기타",
 
     // Onset
     whenDidItStart: "언제부터 아팠나요?",
@@ -475,7 +473,6 @@ const translations = {
     genderLabel: "Jantina",
     gender_male: "Lelaki",
     gender_female: "Perempuan",
-    gender_other: "Lain-lain",
 
     // Onset
     whenDidItStart: "Bila kesakitan bermula?",

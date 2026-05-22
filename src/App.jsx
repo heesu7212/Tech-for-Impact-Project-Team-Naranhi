@@ -1189,10 +1189,27 @@ function PatternIcon({ type, color, size = 48 }) {
 }
 
 const GENDER_OPTIONS = [
-  { key: "male",   icon: "👨" },
-  { key: "female", icon: "👩" },
-  { key: "other",  icon: "🧑" },
+  { key: "male" },
+  { key: "female" },
 ];
+
+function GenderIcon({ type, selected }) {
+  const c = selected ? "#6B21A8" : "#A78BFA";
+  // Male: circle head + broad shoulder block
+  if (type === "male") return (
+    <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+      <circle cx="19" cy="11" r="7" fill={c} />
+      <rect x="9" y="20" width="20" height="16" rx="4" fill={c} />
+    </svg>
+  );
+  // Female: circle head + trapezoid body (wider at bottom)
+  return (
+    <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+      <circle cx="19" cy="11" r="7" fill={c} />
+      <path d="M12 21 Q11 36 6 36 L32 36 Q27 36 26 21 Z" fill={c} />
+    </svg>
+  );
+}
 
 function PainSetupScreen({ onNext, onBack, painData, setPainData, onPatternChosen, gender, setGender, t }) {
   const { onset } = painData;
@@ -1224,7 +1241,7 @@ function PainSetupScreen({ onNext, onBack, painData, setPainData, onPatternChose
       {/* 성별 선택 */}
       <div style={{ padding: "16px 20px 0", flexShrink: 0 }}>
         <div style={{ fontSize: "13px", fontWeight: "700", color: "#374151", marginBottom: "10px" }}>
-          🧑 {t.genderLabel}
+          {t.genderLabel}
         </div>
         <div style={{ display: "flex", gap: "8px" }}>
           {GENDER_OPTIONS.map(g => {
@@ -1234,18 +1251,19 @@ function PainSetupScreen({ onNext, onBack, painData, setPainData, onPatternChose
                 key={g.key}
                 onClick={() => setGender(g.key)}
                 style={{
-                  flex: 1, padding: "12px 6px", borderRadius: "14px",
+                  flex: 1, padding: "14px 6px", borderRadius: "14px",
                   border: `2px solid ${sel ? "#6B21A8" : "#E9D5FF"}`,
                   backgroundColor: sel ? "#EDE9FE" : "#FDFBFF",
                   cursor: "pointer", textAlign: "center",
                   transition: "all 0.15s",
                   boxShadow: sel ? "0 4px 14px rgba(107,33,168,0.2)" : "none",
+                  display: "flex", flexDirection: "column", alignItems: "center", gap: "6px",
                 }}
               >
-                <div style={{ fontSize: "26px", marginBottom: "4px" }}>{g.icon}</div>
-                <div style={{ fontSize: "12px", fontWeight: "700", color: sel ? "#6B21A8" : "#374151" }}>
+                <GenderIcon type={g.key} selected={sel} />
+                <span style={{ fontSize: "13px", fontWeight: "700", color: sel ? "#6B21A8" : "#374151" }}>
                   {t[`gender_${g.key}`]}
-                </div>
+                </span>
               </button>
             );
           })}
@@ -1254,14 +1272,14 @@ function PainSetupScreen({ onNext, onBack, painData, setPainData, onPatternChose
 
       <div style={{ padding: "16px 20px 0", flexShrink: 0 }}>
         <div style={{ fontSize: "13px", fontWeight: "700", color: "#374151", marginBottom: "12px" }}>
-          🕐 {t.whenDidItStart}
+          {t.whenDidItStart}
         </div>
         <OnsetBar onset={onset} setPainData={setPainData} t={t} />
       </div>
 
       <div style={{ padding: "20px 20px 0", flex: 1 }}>
         <div style={{ fontSize: "13px", fontWeight: "700", color: "#374151", marginBottom: "12px" }}>
-          📊 {t.painPatternTitle}
+          {t.painPatternTitle}
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
           {PATTERN_OPTIONS.map(opt => {
