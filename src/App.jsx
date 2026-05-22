@@ -213,13 +213,19 @@ function PainTypeIcon({ id, color, selected, size = 44 }) {
 }
 
 // ─── Mini Entry Card ─────────────────────────────────────────
-function MiniEntryCard({ entry, index, t, totalEntries }) {
+function MiniEntryCard({ entry, index, t, totalEntries, isTimeline, timelineEvents }) {
   const { location, painTypes, intensity } = entry;
-  const intensityColor = intensity <= 4 ? "#F59E0B" : intensity <= 7 ? "#F97316" : "#EF4444";
   const firstType = PAIN_TYPES.find(p => p.id === (painTypes?.[0]));
   const locationLabel = location?.includes("unknown")
     ? t.unknownArea
     : (location?.map(k => t[k]).join(", ") || "—");
+
+  // 타임라인 모드: 노드 강도 흐름 표시 (예: 3→7)
+  const timelineLabel = isTimeline && timelineEvents?.length > 0
+    ? timelineEvents.map(n => n.intensity).join("→")
+    : null;
+  const displayIntensity = timelineLabel || intensity;
+  const iColor = intensity <= 4 ? "#F59E0B" : intensity <= 7 ? "#F97316" : "#EF4444";
 
   return (
     <div style={{
@@ -251,8 +257,16 @@ function MiniEntryCard({ entry, index, t, totalEntries }) {
         </div>
       </div>
       <div style={{ textAlign: "right", flexShrink: 0 }}>
-        <div style={{ fontSize: "20px", fontWeight: "800", color: intensityColor, lineHeight: 1 }}>{intensity}</div>
-        <div style={{ fontSize: "10px", color: "#9CA3AF" }}>/10</div>
+        {timelineLabel ? (
+          <div style={{ fontSize: "13px", fontWeight: "800", color: "#7C3AED", lineHeight: 1.3 }}>
+            {timelineLabel}
+          </div>
+        ) : (
+          <>
+            <div style={{ fontSize: "20px", fontWeight: "800", color: iColor, lineHeight: 1 }}>{displayIntensity}</div>
+            <div style={{ fontSize: "10px", color: "#9CA3AF" }}>/10</div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -700,10 +714,11 @@ function IntensitySlider({ onNext, onBack, painData, setPainData, t }) {
 }
 
 // ─── Add More Screen ─────────────────────────────────────────
-function AddMoreScreen({ entries, currentEntry, onAddMore, onGoSummary, onBack, t }) {
+function AddMoreScreen({ entries, currentEntry, onAddMore, onGoSummary, onBack, painPattern, timelineEvents, t }) {
   const allSoFar = currentEntry.location.length > 0
     ? [...entries, currentEntry]
     : entries;
+  const isTimeline = painPattern && painPattern !== "same";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
@@ -724,7 +739,11 @@ function AddMoreScreen({ entries, currentEntry, onAddMore, onGoSummary, onBack, 
 
       <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px 0" }}>
         {allSoFar.map((entry, i) => (
-          <MiniEntryCard key={i} entry={entry} index={i} t={t} totalEntries={allSoFar.length} />
+          <MiniEntryCard
+            key={i} entry={entry} index={i} t={t} totalEntries={allSoFar.length}
+            isTimeline={isTimeline && i === allSoFar.length - 1}
+            timelineEvents={timelineEvents}
+          />
         ))}
       </div>
 
@@ -1337,11 +1356,13 @@ function nodeColor(intensity) {
   if (intensity <= 6) return "#F97316";
   return "#EF4444";
 }
-function buildInitialNodes(pattern) {
-  if (pattern === "worse")       return [{ intensity: 3 }, { intensity: 7 }];
-  if (pattern === "better")      return [{ intensity: 8 }, { intensity: 3 }];
-  if (pattern === "fluctuating") return [{ intensity: 4 }, { intensity: 8 }, { intensity: 4 }];
-  return [{ intensity: 5 }, { intensity: 5 }];
+function buildInitialNodes(pattern, currentIntensity = 5) {
+  const ci = currentIntensity;
+  const cl = (v) => Math.min(10, Math.max(1, Math.round(v)));
+  if (pattern === "worse")       return [{ intensity: cl(ci - 4) }, { intensity: ci }];
+  if (pattern === "better")      return [{ intensity: cl(ci + 4) }, { intensity: ci }];
+  if (pattern === "fluctuating") return [{ intensity: cl(ci - 2) }, { intensity: cl(ci + 3) }, { intensity: ci }];
+  return [{ intensity: ci }, { intensity: ci }];
 }
 function attachIds(nodes) {
   return nodes.map((n, i) => ({ ...n, id: i, memo: "" }));
@@ -1782,9 +1803,9 @@ export default function App() {
   const t = translations[lang];
 
   const goNext = () => {
-    // After PainTypeSelector (step 4): non-same patterns jump to timeline instead of intensity slider
-    if (step === 4 && painPattern && painPattern !== "same") {
-      setTimelineEvents(attachIds(buildInitialNodes(painPattern)));
+    // After IntensitySlider (step 5): non-same patterns jump to timeline
+    if (step === 5 && painPattern && painPattern !== "same") {
+      setTimelineEvents(attachIds(buildInitialNodes(painPattern, currentEntry.intensity)));
       setStep(20);
     } else {
       setStep(p => p + 1);
@@ -1796,12 +1817,14 @@ export default function App() {
       setStep(6);
     } else if (step === 4) {
       setStep(2);
-    } else if (step === 20) {
+    } else if (step === 5) {
       setStep(4);
+    } else if (step === 20) {
+      setStep(5);   // timeline → back to intensity slider
     } else if (step === 6 && painPattern && painPattern !== "same" && entries.length === 0) {
-      setStep(20);   // AddMore (non-same, first pass) → timeline
+      setStep(20);  // AddMore (non-same, first pass) → timeline
     } else if (step === 7 && painPattern && painPattern !== "same") {
-      setStep(6);    // summary (non-same) → AddMore
+      setStep(6);   // summary (non-same) → AddMore
     } else {
       setStep(p => p - 1);
     }
@@ -1963,7 +1986,7 @@ export default function App() {
           <AddMoreScreen
             entries={entries} currentEntry={currentEntry}
             onAddMore={handleAddMore} onGoSummary={handleGoSummary}
-            onBack={goBack} t={t}
+            onBack={goBack} painPattern={painPattern} timelineEvents={timelineEvents} t={t}
           />
         )}
         {step === 7 && (
@@ -1978,7 +2001,7 @@ export default function App() {
         )}
         {step === 20 && (
           <TimelineEditor
-            onNext={handleTimelineNext} onBack={() => setStep(1)}
+            onNext={handleTimelineNext} onBack={goBack}
             timelineEvents={timelineEvents} setTimelineEvents={setTimelineEvents}
             sessionOnset={currentEntry.onset} lang={lang} t={t}
           />
