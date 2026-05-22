@@ -57,6 +57,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  -webkit-tap-highlight-color: transparent;
 }
 
 #root {
@@ -73,6 +74,30 @@ body {
     0 0 0 10px #111,
     0 0 0 12px #333,
     0 40px 80px rgba(0, 0, 0, 0.6);
+}
+
+/* ── 실제 모바일 기기: 전체 화면으로 표시 ───────────────── */
+@media (max-width: 600px) {
+  body {
+    display: block;
+    background: #fff;
+    min-height: 100dvh;
+  }
+
+  #root {
+    width: 100%;
+    height: 100dvh;
+    max-width: 100%;
+    max-height: 100dvh;
+    border-radius: 0;
+    box-shadow: none;
+    /* iPhone 노치 / Dynamic Island / 홈 인디케이터 여백 */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    box-sizing: border-box;
+  }
 }
 
 h1,
