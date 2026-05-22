@@ -69,6 +69,12 @@ const translations = {
     pastLabel: "← Past", nowLabel: "Now →", daysUnit: "days ago",
     mild: "Mild", moderate: "Moderate", severe: "Severe", verySevere: "Very Severe",
 
+    // Gender
+    genderLabel: "Gender",
+    gender_male: "Male",
+    gender_female: "Female",
+    gender_other: "Other",
+
     // Onset
     whenDidItStart: "When did the pain start?",
     selectOnset: "Select the closest option",
@@ -77,6 +83,11 @@ const translations = {
     onset_1week: "~1 week",
     onset_2to3weeks: "2–3 weeks",
     onset_1month: "1+ month",
+    onset_2months: "2 months",
+    onset_3months: "3 months",
+    onset_4months: "4 months",
+    onset_5months: "5 months",
+    onset_6months_plus: "6+ months",
     painOnset: "Pain started",
     painTrend: "Trend",
 
@@ -111,7 +122,7 @@ const translations = {
     pattern_fluctuating_desc: "Comes and goes / varies",
 
     // TimelineEditor
-    timelineTitle: "Pain timeline",
+    timelineTitle: "Pain intensity timeline",
     timelineSub: "Drag the nodes to adjust intensity",
     timelineNodeLabel: "Tap a node to add details",
     addNode: "+ Add point",
@@ -259,6 +270,12 @@ const translations = {
     pastLabel: "← 과거", nowLabel: "지금 →", daysUnit: "일 전",
     mild: "약함", moderate: "보통", severe: "심함", verySevere: "매우 심함",
 
+    // Gender
+    genderLabel: "성별",
+    gender_male: "남성",
+    gender_female: "여성",
+    gender_other: "기타",
+
     // Onset
     whenDidItStart: "언제부터 아팠나요?",
     selectOnset: "가장 가까운 것을 선택하세요",
@@ -267,6 +284,11 @@ const translations = {
     onset_1week: "약 1주 전",
     onset_2to3weeks: "2~3주 전",
     onset_1month: "1달 이상",
+    onset_2months: "2달 전",
+    onset_3months: "3달 전",
+    onset_4months: "4달 전",
+    onset_5months: "5달 전",
+    onset_6months_plus: "6달 이상",
     painOnset: "통증 시작",
     painTrend: "변화 양상",
 
@@ -301,7 +323,7 @@ const translations = {
     pattern_fluctuating_desc: "왔다 갔다 / 변화가 있음",
 
     // TimelineEditor
-    timelineTitle: "통증 변화 타임라인",
+    timelineTitle: "통증 강도 변화 타임라인",
     timelineSub: "노드를 드래그해서 강도를 조절하세요",
     timelineNodeLabel: "노드를 탭해서 세부 정보를 입력하세요",
     addNode: "+ 시점 추가",
@@ -449,6 +471,12 @@ const translations = {
     pastLabel: "← Lepas", nowLabel: "Kini →", daysUnit: "hari lepas",
     mild: "Ringan", moderate: "Sederhana", severe: "Teruk", verySevere: "Sangat Teruk",
 
+    // Gender
+    genderLabel: "Jantina",
+    gender_male: "Lelaki",
+    gender_female: "Perempuan",
+    gender_other: "Lain-lain",
+
     // Onset
     whenDidItStart: "Bila kesakitan bermula?",
     selectOnset: "Pilih yang paling hampir",
@@ -457,6 +485,11 @@ const translations = {
     onset_1week: "~1 minggu",
     onset_2to3weeks: "2–3 minggu",
     onset_1month: "1+ bulan",
+    onset_2months: "2 bulan",
+    onset_3months: "3 bulan",
+    onset_4months: "4 bulan",
+    onset_5months: "5 bulan",
+    onset_6months_plus: "6+ bulan",
     painOnset: "Mula sakit",
     painTrend: "Perubahan",
 
@@ -491,7 +524,7 @@ const translations = {
     pattern_fluctuating_desc: "Datang pergi / berubah-ubah",
 
     // TimelineEditor
-    timelineTitle: "Garis masa kesakitan",
+    timelineTitle: "Garis masa intensiti kesakitan",
     timelineSub: "Seret nod untuk laraskan intensiti",
     timelineNodeLabel: "Ketik nod untuk tambah butiran",
     addNode: "+ Tambah titik",

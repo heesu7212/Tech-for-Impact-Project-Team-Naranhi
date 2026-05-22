@@ -351,11 +351,40 @@ const ONSET_OPTIONS = [
   { key: "onset_1month",    dayNum: "30+"  },
 ];
 
+const EXTENDED_ONSET = [
+  { key: "onset_2months" },
+  { key: "onset_3months" },
+  { key: "onset_4months" },
+  { key: "onset_5months" },
+  { key: "onset_6months_plus" },
+];
+const EXTENDED_KEYS = EXTENDED_ONSET.map(o => o.key);
+
 function OnsetBar({ onset, setPainData, t }) {
-  const display = [...ONSET_OPTIONS].reverse();
-  const selDispIdx = onset
-    ? ONSET_OPTIONS.length - 1 - ONSET_OPTIONS.findIndex(o => o.key === onset)
-    : -1;
+  const [showExtended, setShowExtended] = useState(false);
+  const display = [...ONSET_OPTIONS].reverse(); // leftmost = onset_1month
+
+  const isExtended = EXTENDED_KEYS.includes(onset);
+
+  // 확장 옵션 선택 시 leftmost bar도 filled처럼 보이게 selDispIdx=0
+  const selDispIdx = isExtended
+    ? 0
+    : onset
+      ? ONSET_OPTIONS.length - 1 - ONSET_OPTIONS.findIndex(o => o.key === onset)
+      : -1;
+
+  const handleBarClick = (opt, di) => {
+    if (di === 0) {
+      // 맨 왼쪽(1달+) 클릭 → 확장 피커 토글, onset도 세팅
+      setShowExtended(prev => !prev);
+      if (!isExtended) {
+        setPainData(prev => ({ ...prev, onset: opt.key }));
+      }
+    } else {
+      setShowExtended(false);
+      setPainData(prev => ({ ...prev, onset: opt.key }));
+    }
+  };
 
   return (
     <div>
@@ -366,27 +395,46 @@ function OnsetBar({ onset, setPainData, t }) {
       <div style={{ display: "flex", gap: "3px" }}>
         {display.map((opt, di) => {
           const filled = selDispIdx !== -1 && di >= selDispIdx;
-          const sel = onset === opt.key;
+          const sel = (onset === opt.key) || (di === 0 && isExtended);
           const isToday = opt.dayNum === "0";
+          const isLeftmost = di === 0;
+
           return (
             <div
               key={opt.key}
-              onClick={() => setPainData(prev => ({ ...prev, onset: opt.key }))}
+              onClick={() => handleBarClick(opt, di)}
               style={{
                 flex: 1, height: "56px",
-                borderRadius: di === 0 ? "12px 4px 4px 12px" : di === display.length - 1 ? "4px 12px 12px 4px" : "4px",
+                borderRadius: isLeftmost ? "12px 4px 4px 12px" : di === display.length - 1 ? "4px 12px 12px 4px" : "4px",
                 backgroundColor: filled ? "#6B21A8" : "#EDE9FE",
                 border: sel ? "2.5px solid #4C1D95" : "2.5px solid transparent",
                 cursor: "pointer",
                 display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
                 transition: "background-color 0.2s",
                 boxShadow: sel ? "0 2px 10px rgba(107,33,168,0.45)" : "none",
+                position: "relative",
               }}
             >
               {isToday ? (
                 <span style={{ fontSize: "9px", fontWeight: "800", color: filled ? "#fff" : "#7C3AED", lineHeight: 1, textAlign: "center" }}>
                   {t.onset_today}
                 </span>
+              ) : isLeftmost && isExtended ? (
+                // 확장 옵션 선택됨 → 해당 월 표시
+                <span style={{ fontSize: "8px", fontWeight: "800", color: "#fff", lineHeight: 1.3, textAlign: "center", padding: "0 2px" }}>
+                  {t[onset]}
+                </span>
+              ) : isLeftmost ? (
+                // 맨 왼쪽 기본 상태 — "···" 표시로 더 있음을 암시
+                <>
+                  <span style={{ fontSize: "11px", fontWeight: "800", color: filled ? "#fff" : "#7C3AED", lineHeight: 1 }}>
+                    {opt.dayNum}
+                  </span>
+                  <span style={{ fontSize: "7px", fontWeight: "600", color: filled ? "rgba(255,255,255,0.75)" : "#A78BFA", lineHeight: 1.4 }}>
+                    {t.daysUnit}
+                  </span>
+                  <span style={{ fontSize: "8px", color: filled ? "rgba(255,255,255,0.7)" : "#A78BFA", lineHeight: 1, marginTop: "1px" }}>▾</span>
+                </>
               ) : (
                 <>
                   <span style={{ fontSize: opt.dayNum.length > 3 ? "9px" : "13px", fontWeight: "800", color: filled ? "#fff" : "#7C3AED", lineHeight: 1 }}>
@@ -401,6 +449,43 @@ function OnsetBar({ onset, setPainData, t }) {
           );
         })}
       </div>
+
+      {/* 확장 월 선택 피커 */}
+      {showExtended && (
+        <div style={{
+          marginTop: "8px", display: "flex", gap: "6px", flexWrap: "wrap",
+          padding: "10px 12px", backgroundColor: "#F5F3FF",
+          borderRadius: "12px", border: "1.5px solid #DDD6FE",
+        }}>
+          <div style={{ width: "100%", fontSize: "10px", fontWeight: "700", color: "#7C3AED",
+            textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "4px" }}>
+            {t.pastLabel}
+          </div>
+          {EXTENDED_ONSET.map(opt => {
+            const sel = onset === opt.key;
+            return (
+              <button
+                key={opt.key}
+                onClick={() => {
+                  setPainData(prev => ({ ...prev, onset: opt.key }));
+                  setShowExtended(false);
+                }}
+                style={{
+                  padding: "6px 14px", borderRadius: "20px",
+                  fontSize: "12px", fontWeight: "700",
+                  border: `1.5px solid ${sel ? "#4C1D95" : "#C4B5FD"}`,
+                  backgroundColor: sel ? "#6B21A8" : "#fff",
+                  color: sel ? "#fff" : "#6B21A8",
+                  cursor: "pointer", transition: "all 0.12s",
+                  boxShadow: sel ? "0 2px 8px rgba(107,33,168,0.35)" : "none",
+                }}
+              >
+                {t[opt.key]}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -1103,7 +1188,13 @@ function PatternIcon({ type, color, size = 48 }) {
   return null;
 }
 
-function PainSetupScreen({ onNext, onBack, painData, setPainData, onPatternChosen, t }) {
+const GENDER_OPTIONS = [
+  { key: "male",   icon: "👨" },
+  { key: "female", icon: "👩" },
+  { key: "other",  icon: "🧑" },
+];
+
+function PainSetupScreen({ onNext, onBack, painData, setPainData, onPatternChosen, gender, setGender, t }) {
   const { onset } = painData;
   const [pattern, setPattern] = useState(null);
 
@@ -1112,6 +1203,8 @@ function PainSetupScreen({ onNext, onBack, painData, setPainData, onPatternChose
     onPatternChosen(pattern);
     onNext(pattern);
   };
+
+  const canProceed = !!gender && !!onset && !!pattern;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", overflowY: "auto" }}>
@@ -1128,7 +1221,38 @@ function PainSetupScreen({ onNext, onBack, painData, setPainData, onPatternChose
         </h2>
       </div>
 
-      <div style={{ padding: "20px 20px 0", flexShrink: 0 }}>
+      {/* 성별 선택 */}
+      <div style={{ padding: "16px 20px 0", flexShrink: 0 }}>
+        <div style={{ fontSize: "13px", fontWeight: "700", color: "#374151", marginBottom: "10px" }}>
+          🧑 {t.genderLabel}
+        </div>
+        <div style={{ display: "flex", gap: "8px" }}>
+          {GENDER_OPTIONS.map(g => {
+            const sel = gender === g.key;
+            return (
+              <button
+                key={g.key}
+                onClick={() => setGender(g.key)}
+                style={{
+                  flex: 1, padding: "12px 6px", borderRadius: "14px",
+                  border: `2px solid ${sel ? "#6B21A8" : "#E9D5FF"}`,
+                  backgroundColor: sel ? "#EDE9FE" : "#FDFBFF",
+                  cursor: "pointer", textAlign: "center",
+                  transition: "all 0.15s",
+                  boxShadow: sel ? "0 4px 14px rgba(107,33,168,0.2)" : "none",
+                }}
+              >
+                <div style={{ fontSize: "26px", marginBottom: "4px" }}>{g.icon}</div>
+                <div style={{ fontSize: "12px", fontWeight: "700", color: sel ? "#6B21A8" : "#374151" }}>
+                  {t[`gender_${g.key}`]}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div style={{ padding: "16px 20px 0", flexShrink: 0 }}>
         <div style={{ fontSize: "13px", fontWeight: "700", color: "#374151", marginBottom: "12px" }}>
           🕐 {t.whenDidItStart}
         </div>
@@ -1170,13 +1294,13 @@ function PainSetupScreen({ onNext, onBack, painData, setPainData, onPatternChose
       <div style={{ padding: "16px 20px 20px", flexShrink: 0 }}>
         <button
           onClick={handleNext}
-          disabled={!onset || !pattern}
+          disabled={!canProceed}
           style={{
             width: "100%", padding: "14px", fontSize: "16px", fontWeight: "600",
-            backgroundColor: onset && pattern ? "#6B21A8" : "#D1D5DB",
+            backgroundColor: canProceed ? "#6B21A8" : "#D1D5DB",
             color: "#fff", border: "none", borderRadius: "12px",
-            cursor: onset && pattern ? "pointer" : "not-allowed",
-            boxShadow: onset && pattern ? "0 4px 14px rgba(107,33,168,0.35)" : "none",
+            cursor: canProceed ? "pointer" : "not-allowed",
+            boxShadow: canProceed ? "0 4px 14px rgba(107,33,168,0.35)" : "none",
           }}
         >
           {t.next}
@@ -1216,6 +1340,11 @@ const ONSET_DAYS = {
   onset_1week: 7,
   onset_2to3weeks: 14,
   onset_1month: 30,
+  onset_2months: 60,
+  onset_3months: 90,
+  onset_4months: 120,
+  onset_5months: 150,
+  onset_6months_plus: 180,
 };
 
 const MONTHS_EN   = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -1613,6 +1742,7 @@ function TimelineSummaryBlock({ events, sessionOnset, lang, t }) {
 export default function App() {
   const [step, setStep] = useState(0);
   const [lang, setLang] = useState("ko");
+  const [gender, setGender] = useState(null);
   const [entries, setEntries] = useState([]);
   const [currentEntry, setCurrentEntry] = useState(emptyEntry());
   const [painPattern, setPainPattern] = useState(null);
@@ -1782,7 +1912,9 @@ export default function App() {
           <PainSetupScreen
             onNext={handleSetupNext} onBack={goBack}
             painData={currentEntry} setPainData={setCurrentEntry}
-            onPatternChosen={handlePatternChosen} t={t}
+            onPatternChosen={handlePatternChosen}
+            gender={gender} setGender={setGender}
+            t={t}
           />
         )}
         {step === 2 && (
