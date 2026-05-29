@@ -323,50 +323,10 @@ function StartScreen({ onNext, t }) {
           {t.start}
         </button>
 
-        {history.length > 0 && (
-          <div style={{
-            position: "absolute", bottom: "18px", left: 0, right: 0,
-            display: "flex", flexDirection: "column", alignItems: "center", gap: "3px",
-          }}>
-            <span style={{ fontSize: "11px", color: "#C4B5FD", fontWeight: "600", letterSpacing: "0.5px" }}>
-              {t.pastRecords}
-            </span>
-            <span style={{ fontSize: "14px", color: "#C4B5FD", lineHeight: 1 }}>↓</span>
-          </div>
-        )}
+
       </div>
 
-      {history.length > 0 && (
-        <div style={{ padding: "20px 20px 28px", borderTop: "1px solid #F3E8FF" }}>
-          <div style={{ fontSize: "12px", color: "#7C3AED", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: "12px" }}>
-            📋 {t.pastRecords}
-          </div>
-          {history.map((session, si) => (
-            <div key={si} style={{
-              borderRadius: "12px", border: "1.5px solid #E9D5FF",
-              backgroundColor: "#FDFBFF", padding: "12px 14px", marginBottom: "10px",
-            }}>
-              <div style={{ fontSize: "11px", color: "#9CA3AF", fontWeight: "600", marginBottom: "10px" }}>
-                {formatDate(session.date)} · {session.entries.length}개 부위
-              </div>
-              {session.entries.map((entry, ei) => {
-                const type = PAIN_TYPES.find(p => p.id === (entry.painTypes?.[0] || entry.painType));
-                const locLabel = entry.location?.includes("unknown")
-                  ? t.unknownArea
-                  : (entry.location?.map(k => t[k]).join(", ") || "—");
-                const iColor = entry.intensity <= 4 ? "#F59E0B" : entry.intensity <= 7 ? "#F97316" : "#EF4444";
-                return (
-                  <div key={ei} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: ei < session.entries.length - 1 ? "6px" : 0 }}>
-                    {type && <PainTypeIcon id={type.id} color={type.color} selected={false} size={24} />}
-                    <span style={{ fontSize: "12px", color: "#374151", flex: 1 }}>{locLabel}</span>
-                    <span style={{ fontSize: "12px", fontWeight: "700", color: iColor }}>{entry.intensity}/10</span>
-                  </div>
-                );
-              })}
-            </div>
-          ))}
-        </div>
-      )}
+
     </div>
   );
 }
@@ -572,21 +532,23 @@ function PainTypeSelector({ onNext, onBack, painData, setPainData, t }) {
                 <div style={{ position: "relative" }}>
                   <video
                     autoPlay loop muted playsInline
-                    style={{ width: "100%", aspectRatio: "4/3", objectFit: "cover", display: "block" }}
+                    style={{ width: "100%", aspectRatio: "1/1", objectFit: "cover", display: "block" }}
                   >
                     <source src={type.video} type="video/mp4" />
                   </video>
                   {sel && (
                     <div style={{ position: "absolute", inset: 0, backgroundColor: `${type.color}30` }} />
                   )}
-                </div>
-                <div style={{
-                  padding: "8px 6px",
-                  fontWeight: "700", fontSize: "12px",
-                  color: sel ? type.color : "#374151",
-                  textAlign: "center",
-                }}>
-                  {t[type.id]}
+                  <div style={{
+                    position: "absolute", bottom: 0, left: 0, right: 0,
+                    padding: "18px 6px 6px",
+                    background: "linear-gradient(transparent, rgba(0,0,0,0.55))",
+                    fontWeight: "700", fontSize: "12px",
+                    color: "#fff",
+                    textAlign: "center",
+                  }}>
+                    {t[type.id]}
+                  </div>
                 </div>
               </div>
             );
