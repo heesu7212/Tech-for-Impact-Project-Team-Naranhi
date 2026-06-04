@@ -30,18 +30,19 @@ export const BODY_ZONES = [
   { id: "left_leg",    pos: [0.12,  -0.57,   0],    size: [0.17,  0.60,  0.14] },
 ];
 
-// ─── 10 head zone slabs ──────────────────────────────────────
+// ─── 7 head zone slabs — all thin-slab style like "top" ──────
 const HEAD_ZONES = [
-  { id: "top",         pos: [0,       0.985,  0    ], size: [0.19,  0.034, 0.19 ] },
-  { id: "forehead",    pos: [0,       0.924,  0.088], size: [0.15,  0.075, 0.034] },
-  { id: "leftTemple",  pos: [-0.118,  0.893,  0.028], size: [0.034, 0.088, 0.098] },
-  { id: "rightTemple", pos: [ 0.118,  0.893,  0.028], size: [0.034, 0.088, 0.098] },
-  { id: "leftEye",     pos: [-0.068,  0.876,  0.092], size: [0.066, 0.042, 0.028] },
-  { id: "rightEye",    pos: [ 0.068,  0.876,  0.092], size: [0.066, 0.042, 0.028] },
-  { id: "leftCheek",   pos: [-0.090,  0.820,  0.088], size: [0.068, 0.065, 0.028] },
-  { id: "rightCheek",  pos: [ 0.090,  0.820,  0.088], size: [0.068, 0.065, 0.028] },
-  { id: "leftSide",    pos: [-0.118,  0.845,  0.015], size: [0.034, 0.108, 0.108] },
-  { id: "rightSide",   pos: [ 0.118,  0.845,  0.015], size: [0.034, 0.108, 0.108] },
+  // horizontal slab — crown
+  { id: "top",         pos: [0,       0.991,  0     ], size: [0.190, 0.028, 0.190] },
+  // front-facing slabs
+  { id: "forehead",    pos: [0,       0.920,  0.111 ], size: [0.155, 0.075, 0.026] },
+  { id: "leftEye",     pos: [-0.065,  0.874,  0.104 ], size: [0.068, 0.042, 0.026] },
+  { id: "rightEye",    pos: [ 0.065,  0.874,  0.104 ], size: [0.068, 0.042, 0.026] },
+  // side-facing slabs
+  { id: "leftTemple",  pos: [-0.099,  0.886,  0.010 ], size: [0.026, 0.090, 0.095] },
+  { id: "rightTemple", pos: [ 0.099,  0.886,  0.010 ], size: [0.026, 0.090, 0.095] },
+  // back-facing slab — moved up, wider
+  { id: "backNeck",    pos: [0,       0.905, -0.106 ], size: [0.215, 0.075, 0.026] },
 ];
 
 // ─── Head zone colours ────────────────────────────────────────
@@ -52,10 +53,7 @@ const ZONE_COLORS = {
   rightTemple:  "#D97706",
   leftEye:      "#DC2626",
   rightEye:     "#DC2626",
-  leftCheek:    "#059669",
-  rightCheek:   "#059669",
-  leftSide:     "#DB2777",
-  rightSide:    "#DB2777",
+  backNeck:     "#059669",
 };
 export { ZONE_COLORS };
 

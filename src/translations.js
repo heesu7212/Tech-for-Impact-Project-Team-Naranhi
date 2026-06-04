@@ -34,8 +34,7 @@ const translations = {
     top: "Crown", forehead: "Forehead",
     leftTemple: "Left Temple", rightTemple: "Right Temple",
     leftEye: "Left Eye Area", rightEye: "Right Eye Area",
-    leftCheek: "Left Cheek", rightCheek: "Right Cheek",
-    leftSide: "Left Side", rightSide: "Right Side",
+    backNeck: "Back of Neck",
 
     // Body regions (3D selector)
     head: "Head",
@@ -234,8 +233,7 @@ const translations = {
     top: "정수리", forehead: "이마",
     leftTemple: "왼쪽 관자놀이", rightTemple: "오른쪽 관자놀이",
     leftEye: "왼쪽 눈 주변", rightEye: "오른쪽 눈 주변",
-    leftCheek: "왼쪽 볼", rightCheek: "오른쪽 볼",
-    leftSide: "왼쪽 측면", rightSide: "오른쪽 측면",
+    backNeck: "뒷목",
 
     // Body regions (3D selector)
     head: "머리",
@@ -434,8 +432,7 @@ const translations = {
     top: "Ubun-ubun", forehead: "Dahi",
     leftTemple: "Pelipis Kiri", rightTemple: "Pelipis Kanan",
     leftEye: "Kawasan Mata Kiri", rightEye: "Kawasan Mata Kanan",
-    leftCheek: "Pipi Kiri", rightCheek: "Pipi Kanan",
-    leftSide: "Sisi Kiri", rightSide: "Sisi Kanan",
+    backNeck: "Tengkuk",
 
     // Body regions (3D selector)
     head: "Kepala",

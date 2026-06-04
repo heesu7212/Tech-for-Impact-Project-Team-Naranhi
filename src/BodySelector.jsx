@@ -3,8 +3,7 @@ import BodySelector3D, { ZONE_COLORS } from "./components/BodySelector3D";
 
 const HEAD_ZONE_IDS = [
   "top", "forehead", "leftTemple", "rightTemple",
-  "leftEye", "rightEye", "leftCheek", "rightCheek",
-  "leftSide", "rightSide",
+  "leftEye", "rightEye", "backNeck",
 ];
 
 export default function BodySelector({ onNext, onBack, setPainData, t }) {

@@ -3,6 +3,8 @@ import "./App.css";
 import translations from "./translations";
 import BodySelector from "./BodySelector";
 import { savePainRecord } from "./lib/supabase";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 // ─── Pain type videos ────────────────────────────────────────
 import vid_dull_foggy      from "./assets/videos/dull_foggy.mp4";
@@ -521,11 +523,11 @@ function PainTypeSelector({ onNext, onBack, painData, setPainData, t }) {
                 style={{
                   borderRadius: "14px",
                   border: "2.5px solid",
-                  borderColor: sel ? type.color : type.border,
-                  backgroundColor: sel ? type.bg : "#fff",
+                  borderColor: sel ? "#7C3AED" : type.border,
+                  backgroundColor: sel ? "#F5F3FF" : "#fff",
                   cursor: "pointer",
                   transition: "all 0.15s ease",
-                  boxShadow: sel ? `0 4px 14px ${type.color}28` : "none",
+                  boxShadow: sel ? "0 4px 14px rgba(124,58,237,0.28)" : "none",
                   overflow: "hidden",
                 }}
               >
@@ -537,7 +539,7 @@ function PainTypeSelector({ onNext, onBack, painData, setPainData, t }) {
                     <source src={type.video} type="video/mp4" />
                   </video>
                   {sel && (
-                    <div style={{ position: "absolute", inset: 0, backgroundColor: `${type.color}30` }} />
+                    <div style={{ position: "absolute", inset: 0, backgroundColor: "rgba(124,58,237,0.18)" }} />
                   )}
                   <div style={{
                     position: "absolute", bottom: 0, left: 0, right: 0,
@@ -859,13 +861,150 @@ function EntryBlock({ entry, index, t, totalEntries, dateLabel }) {
 // ─── Summary Card (Step 5) ───────────────────────────────────
 function SummaryCard({ entries, currentEntry, onConsent, onBack, painPattern, timelineEvents, sessionOnset, lang, t, sessionNote, setSessionNote }) {
   const [pdfToast, setPdfToast] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
   const allEntries = [...entries, currentEntry].filter(e => e.location?.length > 0 && e.painTypes?.length > 0);
   const isTimelineMode = painPattern && painPattern !== "same" && timelineEvents?.length > 0;
   const patternOpt = PATTERN_OPTIONS.find(p => p.key === painPattern);
 
-  const handleDownloadPdf = () => {
-    setPdfToast(true);
-    setTimeout(() => setPdfToast(false), 2500);
+  const handleDownloadPdf = async () => {
+    setPdfLoading(true);
+
+    const iColor = (v) => v <= 4 ? "#F59E0B" : v <= 7 ? "#F97316" : "#EF4444";
+    const iLabelFn = (v) => v <= 3 ? t.mild : v <= 6 ? t.moderate : v <= 8 ? t.severe : t.verySevere;
+    const buildBar = (intensity) =>
+      Array.from({ length: 10 }, (_, i) =>
+        `<div style="flex:1;height:7px;border-radius:3px;background:${i < intensity ? iColor(i + 1) : "#E5E7EB"}"></div>`
+      ).join("");
+
+    const dateStr = new Date().toLocaleDateString(
+      lang === "ko" ? "ko-KR" : lang === "ms" ? "ms-MY" : "en-US",
+      { year: "numeric", month: "long", day: "numeric" }
+    );
+
+    let entriesHtml = "";
+    allEntries.forEach((entry, idx) => {
+      const locLabel = entry.location?.includes("unknown")
+        ? t.unknownArea
+        : entry.location?.map(k => t[k]).join(", ") || "—";
+      const typeNames = entry.painTypes?.map(id => t[id]).join(", ") || "—";
+
+      let exprsHtml = "";
+      if (entry.painTypes?.length > 0) {
+        const rows = entry.painTypes.map(pt => {
+          const expr = t.medicalExpressions?.[pt];
+          if (!expr) return "";
+          return `
+            <div style="margin-bottom:10px">
+              <div style="background:#EDE9FE;border-radius:8px;padding:8px 12px;margin-bottom:6px">
+                <div style="font-size:10px;color:#7C3AED;font-weight:600;margin-bottom:3px">${t.medicalTerm}</div>
+                <div style="font-size:13px;color:#3B0764;font-weight:700">${expr.medical}</div>
+              </div>
+              <div style="background:#fff;border-radius:8px;padding:8px 12px;border-left:4px solid #7C3AED">
+                <div style="font-size:10px;color:#7C3AED;font-weight:600;margin-bottom:4px">${t.koreanExpr}</div>
+                <div style="font-size:13px;color:#1F0A3C;line-height:1.65">&ldquo;${expr.phrase(locLabel)}&rdquo;</div>
+              </div>
+            </div>`;
+        }).join("");
+        if (rows.trim()) {
+          exprsHtml = `
+            <div style="background:#F5F3FF;border-radius:12px;padding:14px 16px;border:1.5px solid #DDD6FE;margin-top:8px">
+              <div style="font-size:11px;color:#7C3AED;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px">💬 ${t.expressionTitle}</div>
+              ${rows}
+            </div>`;
+        }
+      }
+
+      entriesHtml += `
+        <div style="margin-bottom:20px">
+          ${allEntries.length > 1 ? `<div style="font-size:11px;font-weight:700;color:#7C3AED;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px">${t.entryLabel} ${idx + 1}</div>` : ""}
+          <div style="background:#FDFBFF;border:2px solid #E9D5FF;border-radius:12px;padding:14px 18px;margin-bottom:8px">
+            <div style="display:flex;justify-content:space-between;padding-bottom:8px;margin-bottom:8px;border-bottom:1px solid #F3E8FF">
+              <span style="color:#888;font-size:12px">${t.painLocation}</span>
+              <span style="font-weight:700;color:#6B21A8;font-size:12px">${locLabel}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding-bottom:8px;margin-bottom:8px;border-bottom:1px solid #F3E8FF">
+              <span style="color:#888;font-size:12px">${t.painType}</span>
+              <span style="font-weight:700;color:#6B21A8;font-size:12px;max-width:60%;text-align:right">${typeNames}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+              <span style="color:#888;font-size:12px">${t.intensity}</span>
+              <span style="font-weight:700;color:${iColor(entry.intensity)};font-size:12px">${entry.intensity} / 10 — ${iLabelFn(entry.intensity)}</span>
+            </div>
+            <div style="display:flex;gap:3px">${buildBar(entry.intensity)}</div>
+          </div>
+          ${exprsHtml}
+        </div>`;
+    });
+
+    const patternHtml = patternOpt ? `
+      <div style="border:1.5px solid #E9D5FF;border-radius:10px;padding:12px 16px;margin-bottom:18px;background:#FDFBFF">
+        <div style="font-size:11px;color:#9CA3AF;font-weight:600;margin-bottom:2px">${t.painTrend}</div>
+        <div style="font-size:15px;font-weight:700;color:${patternOpt.color}">${t[`pattern_${patternOpt.key}`]}</div>
+      </div>` : "";
+
+    const noteHtml = sessionNote?.length > 0 ? `
+      <div style="background:#F5F3FF;border-radius:10px;padding:12px 16px;border:1.5px solid #DDD6FE;margin-top:4px">
+        <div style="font-size:11px;color:#7C3AED;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">📝 ${t.sessionNoteLabel}</div>
+        <div style="font-size:13px;color:#374151;line-height:1.65;white-space:pre-wrap">${sessionNote.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+      </div>` : "";
+
+    const wrap = document.createElement("div");
+    wrap.style.cssText = [
+      "position:absolute", "top:0", "left:-9999px",
+      "width:794px", "background:#fff", "padding:52px 60px 100px",
+      "box-sizing:border-box",
+      "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif",
+      "font-size:13px", "color:#1F0A3C", "line-height:1.6",
+    ].join(";");
+
+    wrap.innerHTML = `
+      <div style="background:linear-gradient(135deg,#4C1D95,#7C3AED);color:#fff;padding:24px 28px;border-radius:12px;margin-bottom:20px">
+        <div style="font-size:11px;opacity:0.75;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">${dateStr}</div>
+        <div style="font-size:24px;font-weight:700;margin-bottom:4px">${t.painSummary}</div>
+        <div style="font-size:13px;opacity:0.85">${t.reviewShare}</div>
+      </div>
+      <div style="background:#FEF3C7;border:1px solid #F59E0B;border-radius:8px;padding:10px 14px;margin-bottom:20px;font-size:12px;color:#92400E;font-weight:600">
+        ⚠ ${t.disclaimer}
+      </div>
+      ${patternHtml}
+      ${entriesHtml}
+      ${noteHtml}
+    `;
+
+    document.body.appendChild(wrap);
+
+    try {
+      await new Promise(r => setTimeout(r, 60));
+      const canvas = await html2canvas(wrap, {
+        scale: 2, backgroundColor: "#ffffff",
+        useCORS: true, logging: false,
+      });
+      document.body.removeChild(wrap);
+
+      const imgData = canvas.toDataURL("image/jpeg", 0.92);
+      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      const pdfW = pdf.internal.pageSize.getWidth();
+      const pdfH = pdf.internal.pageSize.getHeight();
+      const imgH = (canvas.height * pdfW) / canvas.width;
+
+      let y = 0;
+      let remaining = imgH;
+      while (remaining > 0) {
+        if (y > 0) pdf.addPage();
+        pdf.addImage(imgData, "JPEG", 0, -y, pdfW, imgH);
+        y += pdfH;
+        remaining -= pdfH;
+      }
+
+      pdf.save("pain-summary.pdf");
+      setPdfToast(true);
+      setTimeout(() => setPdfToast(false), 2500);
+    } catch (e) {
+      console.error("PDF generation failed:", e);
+      if (document.body.contains(wrap)) document.body.removeChild(wrap);
+    } finally {
+      setPdfLoading(false);
+    }
   };
 
   return (
@@ -1006,14 +1145,16 @@ function SummaryCard({ entries, currentEntry, onConsent, onBack, painPattern, ti
 
         <button
           onClick={handleDownloadPdf}
+          disabled={pdfLoading}
           style={{
             width: "100%", padding: "13px", fontSize: "14px", fontWeight: "600",
-            backgroundColor: "#fff", color: "#6B21A8",
+            backgroundColor: "#fff", color: pdfLoading ? "#A78BFA" : "#6B21A8",
             border: "1.5px solid #DDD6FE", borderRadius: "12px",
-            cursor: "pointer", marginBottom: "24px",
+            cursor: pdfLoading ? "not-allowed" : "pointer", marginBottom: "24px",
+            opacity: pdfLoading ? 0.7 : 1,
           }}
         >
-          ⬇ {t.downloadPdf}
+          {pdfLoading ? "⏳ PDF 생성 중…" : `⬇ ${t.downloadPdf}`}
         </button>
       </div>
 
