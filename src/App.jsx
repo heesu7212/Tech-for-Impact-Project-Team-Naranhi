@@ -15,6 +15,8 @@ import vid_throbbing       from "./assets/videos/throbbing.mp4";
 import vid_heavy           from "./assets/videos/heavy.mp4";
 import vid_aching_stabbing from "./assets/videos/aching_stabbing.mp4";
 import vid_cold_sharp      from "./assets/videos/cold_sharp.mp4";
+import vid_sharp_pain      from "./assets/videos/sharp_pain.mp4";
+import vid_fever           from "./assets/videos/fever.mp4";
 
 function emptyEntry() {
   return { location: [], painTypes: [], intensity: 5, onset: null };
@@ -58,6 +60,8 @@ const PAIN_TYPES = [
   { id: "heavy",           color: "#374151", bg: "#F3F4F6", border: "#D1D5DB", video: vid_heavy           },
   { id: "aching_stabbing", color: "#EA580C", bg: "#FFF7ED", border: "#FED7AA", video: vid_aching_stabbing },
   { id: "cold_sharp",      color: "#0891B2", bg: "#ECFEFF", border: "#A5F3FC", video: vid_cold_sharp      },
+  { id: "sharp_pain",      color: "#4F46E5", bg: "#EEF2FF", border: "#C7D2FE", video: vid_sharp_pain      },
+  { id: "fever",           color: "#E11D48", bg: "#FFF1F2", border: "#FCA5A5", video: vid_fever           },
 ];
 
 // ─── Pain Type Icons ─────────────────────────────────────────
@@ -207,6 +211,35 @@ function PainTypeIcon({ id, color, selected, size = 44 }) {
         <path d="M34,28 Q38,32 42,28 Q46,24 50,28" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" style={{ opacity: dim }} />
         <line x1="33" y1="23" x2="46" y2="7" stroke={color} strokeWidth="2.5" strokeLinecap="round" style={{ opacity: dim }} />
         <polygon points="46,7 39,13 35,9" fill={color} style={{ opacity: dim }} />
+      </svg>
+    );
+  }
+
+  // 찌릿한 통증 — lightning bolt with sparks
+  if (id === "sharp_pain") {
+    return (
+      <svg viewBox="0 0 56 56" width={size} height={size}>
+        <polygon points="31,4 18,30 27,30 25,52 38,26 29,26" fill={color} style={{ opacity: dim }} />
+        <line x1="40" y1="10" x2="47" y2="6"  stroke={color} strokeWidth="2" strokeLinecap="round" style={{ opacity: dim }} />
+        <line x1="42" y1="20" x2="50" y2="19" stroke={color} strokeWidth="2" strokeLinecap="round" style={{ opacity: dim }} />
+        <line x1="12" y1="28" x2="6"  y2="24" stroke={color} strokeWidth="2" strokeLinecap="round" style={{ opacity: dim }} />
+        <line x1="13" y1="38" x2="7"  y2="40" stroke={color} strokeWidth="2" strokeLinecap="round" style={{ opacity: dim }} />
+      </svg>
+    );
+  }
+
+  // 열이 나는 통증 — flame
+  if (id === "fever") {
+    return (
+      <svg viewBox="0 0 56 56" width={size} height={size}>
+        <path
+          d="M28,52 C16,52 10,42 12,31 C14,22 21,19 21,11 C24,16 24,21 26,24 C26,17 28,9 33,4 C33,14 37,19 41,24 C45,29 46,38 43,44 C40,50 34,52 28,52 Z"
+          fill={color} style={{ opacity: dim }}
+        />
+        <path
+          d="M28,48 C22,48 18,42 20,36 C22,31 26,28 27,23 C28,28 31,32 32,36 C34,40 32,46 28,48 Z"
+          fill={color} style={{ opacity: selected ? 0.25 : 0.08 }}
+        />
       </svg>
     );
   }
@@ -869,46 +902,65 @@ function SummaryCard({ entries, currentEntry, onConsent, onBack, painPattern, ti
   const handleDownloadPdf = async () => {
     setPdfLoading(true);
 
+    const tKo = translations['ko'];
+    const isKo = lang === 'ko';
+    // Show Korean text; if user picked a different language, append it after " / "
+    const bi = (koStr, userStr) => isKo ? koStr : `${koStr} / ${userStr}`;
+
     const iColor = (v) => v <= 4 ? "#F59E0B" : v <= 7 ? "#F97316" : "#EF4444";
+    const iLabelKo = (v) => v <= 3 ? tKo.mild : v <= 6 ? tKo.moderate : v <= 8 ? tKo.severe : tKo.verySevere;
     const iLabelFn = (v) => v <= 3 ? t.mild : v <= 6 ? t.moderate : v <= 8 ? t.severe : t.verySevere;
     const buildBar = (intensity) =>
       Array.from({ length: 10 }, (_, i) =>
         `<div style="flex:1;height:7px;border-radius:3px;background:${i < intensity ? iColor(i + 1) : "#E5E7EB"}"></div>`
       ).join("");
 
-    const dateStr = new Date().toLocaleDateString(
-      lang === "ko" ? "ko-KR" : lang === "ms" ? "ms-MY" : "en-US",
-      { year: "numeric", month: "long", day: "numeric" }
-    );
+    const localeMap = { ko: "ko-KR", ms: "ms-MY", zh: "zh-CN", en: "en-US" };
+    const dateStrKo = new Date().toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" });
+    const dateStrUser = new Date().toLocaleDateString(localeMap[lang] || "en-US", { year: "numeric", month: "long", day: "numeric" });
+    const headerDate = isKo ? dateStrKo : `${dateStrKo}  /  ${dateStrUser}`;
 
     let entriesHtml = "";
     allEntries.forEach((entry, idx) => {
-      const locLabel = entry.location?.includes("unknown")
+      const locLabelKo = entry.location?.includes("unknown")
+        ? tKo.unknownArea
+        : entry.location?.map(k => tKo[k]).join(", ") || "—";
+      const locLabelUser = entry.location?.includes("unknown")
         ? t.unknownArea
         : entry.location?.map(k => t[k]).join(", ") || "—";
-      const typeNames = entry.painTypes?.map(id => t[id]).join(", ") || "—";
+
+      const typeNamesKo = entry.painTypes?.map(id => tKo[id]).join(", ") || "—";
+      const typeNamesUser = entry.painTypes?.map(id => t[id]).join(", ") || "—";
+
+      const intensityLabel = `${entry.intensity} / 10 — ${bi(iLabelKo(entry.intensity), iLabelFn(entry.intensity))}`;
 
       let exprsHtml = "";
       if (entry.painTypes?.length > 0) {
         const rows = entry.painTypes.map(pt => {
-          const expr = t.medicalExpressions?.[pt];
-          if (!expr) return "";
+          const exprKo = tKo.medicalExpressions?.[pt];
+          const exprUser = t.medicalExpressions?.[pt];
+          if (!exprKo) return "";
+          const userPhraseHtml = !isKo && exprUser ? `
+            <div style="font-size:12px;color:#4C1D95;line-height:1.6;margin-top:6px;padding-top:6px;border-top:1px dashed #DDD6FE">
+              &ldquo;${exprUser.phrase(locLabelUser)}&rdquo;
+            </div>` : "";
           return `
             <div style="margin-bottom:10px">
               <div style="background:#EDE9FE;border-radius:8px;padding:8px 12px;margin-bottom:6px">
-                <div style="font-size:10px;color:#7C3AED;font-weight:600;margin-bottom:3px">${t.medicalTerm}</div>
-                <div style="font-size:13px;color:#3B0764;font-weight:700">${expr.medical}</div>
+                <div style="font-size:10px;color:#7C3AED;font-weight:600;margin-bottom:3px">${tKo.medicalTerm}</div>
+                <div style="font-size:13px;color:#3B0764;font-weight:700">${exprKo.medical}</div>
               </div>
               <div style="background:#fff;border-radius:8px;padding:8px 12px;border-left:4px solid #7C3AED">
-                <div style="font-size:10px;color:#7C3AED;font-weight:600;margin-bottom:4px">${t.koreanExpr}</div>
-                <div style="font-size:13px;color:#1F0A3C;line-height:1.65">&ldquo;${expr.phrase(locLabel)}&rdquo;</div>
+                <div style="font-size:10px;color:#7C3AED;font-weight:600;margin-bottom:4px">${tKo.koreanExpr}</div>
+                <div style="font-size:13px;color:#1F0A3C;line-height:1.65">&ldquo;${exprKo.phrase(locLabelKo)}&rdquo;</div>
+                ${userPhraseHtml}
               </div>
             </div>`;
         }).join("");
         if (rows.trim()) {
           exprsHtml = `
             <div style="background:#F5F3FF;border-radius:12px;padding:14px 16px;border:1.5px solid #DDD6FE;margin-top:8px">
-              <div style="font-size:11px;color:#7C3AED;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px">💬 ${t.expressionTitle}</div>
+              <div style="font-size:11px;color:#7C3AED;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px">💬 ${bi(tKo.expressionTitle, t.expressionTitle)}</div>
               ${rows}
             </div>`;
         }
@@ -916,19 +968,19 @@ function SummaryCard({ entries, currentEntry, onConsent, onBack, painPattern, ti
 
       entriesHtml += `
         <div style="margin-bottom:20px">
-          ${allEntries.length > 1 ? `<div style="font-size:11px;font-weight:700;color:#7C3AED;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px">${t.entryLabel} ${idx + 1}</div>` : ""}
+          ${allEntries.length > 1 ? `<div style="font-size:11px;font-weight:700;color:#7C3AED;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px">${bi(tKo.entryLabel, t.entryLabel)} ${idx + 1}</div>` : ""}
           <div style="background:#FDFBFF;border:2px solid #E9D5FF;border-radius:12px;padding:14px 18px;margin-bottom:8px">
             <div style="display:flex;justify-content:space-between;padding-bottom:8px;margin-bottom:8px;border-bottom:1px solid #F3E8FF">
-              <span style="color:#888;font-size:12px">${t.painLocation}</span>
-              <span style="font-weight:700;color:#6B21A8;font-size:12px">${locLabel}</span>
+              <span style="color:#888;font-size:12px">${bi(tKo.painLocation, t.painLocation)}</span>
+              <span style="font-weight:700;color:#6B21A8;font-size:12px">${bi(locLabelKo, locLabelUser)}</span>
             </div>
             <div style="display:flex;justify-content:space-between;padding-bottom:8px;margin-bottom:8px;border-bottom:1px solid #F3E8FF">
-              <span style="color:#888;font-size:12px">${t.painType}</span>
-              <span style="font-weight:700;color:#6B21A8;font-size:12px;max-width:60%;text-align:right">${typeNames}</span>
+              <span style="color:#888;font-size:12px">${bi(tKo.painType, t.painType)}</span>
+              <span style="font-weight:700;color:#6B21A8;font-size:12px;max-width:60%;text-align:right">${bi(typeNamesKo, typeNamesUser)}</span>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
-              <span style="color:#888;font-size:12px">${t.intensity}</span>
-              <span style="font-weight:700;color:${iColor(entry.intensity)};font-size:12px">${entry.intensity} / 10 — ${iLabelFn(entry.intensity)}</span>
+              <span style="color:#888;font-size:12px">${bi(tKo.intensity, t.intensity)}</span>
+              <span style="font-weight:700;color:${iColor(entry.intensity)};font-size:12px">${intensityLabel}</span>
             </div>
             <div style="display:flex;gap:3px">${buildBar(entry.intensity)}</div>
           </div>
@@ -938,13 +990,13 @@ function SummaryCard({ entries, currentEntry, onConsent, onBack, painPattern, ti
 
     const patternHtml = patternOpt ? `
       <div style="border:1.5px solid #E9D5FF;border-radius:10px;padding:12px 16px;margin-bottom:18px;background:#FDFBFF">
-        <div style="font-size:11px;color:#9CA3AF;font-weight:600;margin-bottom:2px">${t.painTrend}</div>
-        <div style="font-size:15px;font-weight:700;color:${patternOpt.color}">${t[`pattern_${patternOpt.key}`]}</div>
+        <div style="font-size:11px;color:#9CA3AF;font-weight:600;margin-bottom:2px">${bi(tKo.painTrend, t.painTrend)}</div>
+        <div style="font-size:15px;font-weight:700;color:${patternOpt.color}">${bi(tKo[`pattern_${patternOpt.key}`], t[`pattern_${patternOpt.key}`])}</div>
       </div>` : "";
 
     const noteHtml = sessionNote?.length > 0 ? `
       <div style="background:#F5F3FF;border-radius:10px;padding:12px 16px;border:1.5px solid #DDD6FE;margin-top:4px">
-        <div style="font-size:11px;color:#7C3AED;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">📝 ${t.sessionNoteLabel}</div>
+        <div style="font-size:11px;color:#7C3AED;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">📝 ${bi(tKo.sessionNoteLabel, t.sessionNoteLabel)}</div>
         <div style="font-size:13px;color:#374151;line-height:1.65;white-space:pre-wrap">${sessionNote.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
       </div>` : "";
 
@@ -953,18 +1005,18 @@ function SummaryCard({ entries, currentEntry, onConsent, onBack, painPattern, ti
       "position:absolute", "top:0", "left:-9999px",
       "width:794px", "background:#fff", "padding:52px 60px 100px",
       "box-sizing:border-box",
-      "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif",
+      "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans SC',sans-serif",
       "font-size:13px", "color:#1F0A3C", "line-height:1.6",
     ].join(";");
 
     wrap.innerHTML = `
       <div style="background:linear-gradient(135deg,#4C1D95,#7C3AED);color:#fff;padding:24px 28px;border-radius:12px;margin-bottom:20px">
-        <div style="font-size:11px;opacity:0.75;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">${dateStr}</div>
-        <div style="font-size:24px;font-weight:700;margin-bottom:4px">${t.painSummary}</div>
-        <div style="font-size:13px;opacity:0.85">${t.reviewShare}</div>
+        <div style="font-size:11px;opacity:0.75;letter-spacing:1px;margin-bottom:6px">${headerDate}</div>
+        <div style="font-size:24px;font-weight:700;margin-bottom:4px">${tKo.painSummary}${!isKo ? ` <span style="font-size:16px;font-weight:400;opacity:0.8">/ ${t.painSummary}</span>` : ""}</div>
+        <div style="font-size:13px;opacity:0.85">${bi(tKo.reviewShare, t.reviewShare)}</div>
       </div>
       <div style="background:#FEF3C7;border:1px solid #F59E0B;border-radius:8px;padding:10px 14px;margin-bottom:20px;font-size:12px;color:#92400E;font-weight:600">
-        ⚠ ${t.disclaimer}
+        ⚠ ${bi(tKo.disclaimer, t.disclaimer)}
       </div>
       ${patternHtml}
       ${entriesHtml}
@@ -1367,6 +1419,8 @@ function PainSetupScreen({ onNext, onBack, painData, setPainData, onPatternChose
         }}>
           {GENDER_OPTIONS.map(g => {
             const sel = gender === g.key;
+            const selColor = g.key === "male" ? "#6366F1" : "#D946EF";
+            const shadowColor = g.key === "male" ? "rgba(99,102,241,0.35)" : "rgba(217,70,239,0.35)";
             return (
               <button
                 key={g.key}
@@ -1374,11 +1428,11 @@ function PainSetupScreen({ onNext, onBack, painData, setPainData, onPatternChose
                 style={{
                   flex: 1, padding: "12px 0",
                   borderRadius: "10px", border: "none",
-                  backgroundColor: sel ? "#6B21A8" : "transparent",
+                  backgroundColor: sel ? selColor : "transparent",
                   color: sel ? "#fff" : "#7C3AED",
                   fontSize: "15px", fontWeight: "700",
                   cursor: "pointer", transition: "all 0.15s",
-                  boxShadow: sel ? "0 2px 8px rgba(107,33,168,0.3)" : "none",
+                  boxShadow: sel ? `0 2px 8px ${shadowColor}` : "none",
                 }}
               >
                 {t[`gender_${g.key}`]}
@@ -1489,6 +1543,7 @@ const MONTHS_EN   = ['January','February','March','April','May','June','July','A
 const MONTHS_EN_S = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const MONTHS_MS   = ['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'];
 const MONTHS_MS_S = ['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogs','Sep','Okt','Nov','Dis'];
+const MONTHS_ZH_S = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
 
 function ordinalEn(n) {
   const s = ['th','st','nd','rd'], v = n % 100;
@@ -1516,6 +1571,9 @@ function nodeDateInfo(nodes, onset, lang = 'en') {
     } else if (lang === 'ms') {
       full    = `${day} ${MONTHS_MS[mo]} ${yr}`;
       svgDate = `${day} ${MONTHS_MS_S[mo]}`;
+    } else if (lang === 'zh') {
+      full    = `${yr}年${mo + 1}月${day}日`;
+      svgDate = `${MONTHS_ZH_S[mo]}${day}日`;
     } else {
       full    = `${ordinalEn(day)} ${MONTHS_EN[mo]} ${yr}`;
       svgDate = `${day} ${MONTHS_EN_S[mo]}`;
@@ -1523,9 +1581,9 @@ function nodeDateInfo(nodes, onset, lang = 'en') {
 
     let svgCtx = null;
     if (daysAgo === 0) {
-      svgCtx = lang === 'ko' ? '지금' : lang === 'ms' ? 'sekarang' : 'now';
+      svgCtx = lang === 'ko' ? '지금' : lang === 'ms' ? 'sekarang' : lang === 'zh' ? '现在' : 'now';
     } else if (i === 0 && daysAgo > 0) {
-      svgCtx = lang === 'ko' ? `${daysAgo}일 전` : lang === 'ms' ? `${daysAgo} hari lepas` : `${daysAgo} days ago`;
+      svgCtx = lang === 'ko' ? `${daysAgo}일 전` : lang === 'ms' ? `${daysAgo} hari lepas` : lang === 'zh' ? `${daysAgo}天前` : `${daysAgo} days ago`;
     }
 
     return { full: svgCtx ? `${full} (${svgCtx})` : full, svgDate, svgCtx };
@@ -1673,7 +1731,7 @@ function TimelineEditor({ onNext, onBack, timelineEvents, setTimelineEvents, ses
         <div style={{ backgroundColor: "#0C0020", borderRadius: "16px", overflow: "hidden" }}>
           {/* Y-axis label */}
           <div style={{ display: "flex", justifyContent: "flex-end", padding: "4px 12px 0 0" }}>
-            <span style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)", letterSpacing: "0.5px" }}>INTENSITY ▲</span>
+            <span style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)", letterSpacing: "0.5px" }}>{t.intensity} ▲</span>
           </div>
           <svg ref={svgRef} viewBox={`0 0 ${SVG_W} ${SVG_H}`} style={{ width: "100%", display: "block", touchAction: "none" }}>
             {/* Y-axis grid */}
@@ -2053,6 +2111,7 @@ export default function App() {
           <option value="en">🇬🇧 EN</option>
           <option value="ko">🇰🇷 한국어</option>
           <option value="ms">🇲🇾 BM</option>
+          <option value="zh">🇨🇳 中文</option>
         </select>
       </div>
 

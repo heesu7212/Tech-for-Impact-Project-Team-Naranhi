@@ -60,6 +60,8 @@ const translations = {
     dull_foggy:      "Foggy / Dull",
     dizzy:           "Dizzy",
     aching_stabbing: "Aching / Stabbing",
+    sharp_pain:      "Tingling / Electric",
+    fever:           "Burning / Feverish",
 
     // IntensitySlider
     howIntense: "How intense is the pain?",
@@ -195,6 +197,14 @@ const translations = {
         medical: "Deep somatic pain / Lancinating pain",
         phrase: (loc) => `The ${loc} has a deep, persistent aching sensation combined with sudden sharp stabbing episodes.`,
       },
+      sharp_pain: {
+        medical: "Paresthesia / Electric-type pain",
+        phrase: (loc) => `The ${loc} has a sharp, electric tingling sensation — like a sudden jolt or pins and needles.`,
+      },
+      fever: {
+        medical: "Burning / Thermal pain",
+        phrase: (loc) => `The ${loc} feels hot and burning, like intense heat radiating from within.`,
+      },
     },
   },
 
@@ -259,6 +269,8 @@ const translations = {
     dull_foggy:      "띵한 통증",
     dizzy:           "어지러운 통증",
     aching_stabbing: "쑤시고 찌르는 통증",
+    sharp_pain:      "찌릿한 통증",
+    fever:           "열이 나는 통증",
 
     // IntensitySlider
     howIntense: "통증이 얼마나 심한가요?",
@@ -394,6 +406,14 @@ const translations = {
         medical: "심부통 (深部痛) / 자통 (刺痛)",
         phrase: (loc) => `${loc} 깊은 곳에서 쑤시는 느낌이 지속되다가 가끔씩 날카롭게 찌르는 통증이 와요.`,
       },
+      sharp_pain: {
+        medical: "감각이상 (感覺異常) / 전기성 통증",
+        phrase: (loc) => `${loc}에 전기가 오는 것처럼 찌릿찌릿한 느낌이에요.`,
+      },
+      fever: {
+        medical: "작열통 (灼熱痛) / 열성 통증",
+        phrase: (loc) => `${loc}이(가) 불에 타는 것처럼 뜨겁고 화끈거려요.`,
+      },
     },
   },
 
@@ -458,6 +478,8 @@ const translations = {
     dull_foggy:      "Kabur / Tebal",
     dizzy:           "Pening",
     aching_stabbing: "Sengal / Menusuk",
+    sharp_pain:      "Kesemutan / Elektrik",
+    fever:           "Panas / Terbakar",
 
     // IntensitySlider
     howIntense: "Seberapa teruk kesakitan itu?",
@@ -592,6 +614,222 @@ const translations = {
       aching_stabbing: {
         medical: "Sakit dalam / sakit menusuk",
         phrase: (loc) => `${loc} terasa sengal yang dalam dan berterusan, diselangi dengan episod menusuk yang tajam.`,
+      },
+      sharp_pain: {
+        medical: "Parestesia / Sakit jenis elektrik",
+        phrase: (loc) => `${loc} terasa seperti kesemutan elektrik yang tajam — seperti renjatan tiba-tiba atau jarum menusuk.`,
+      },
+      fever: {
+        medical: "Sakit terbakar / Sakit terma",
+        phrase: (loc) => `${loc} terasa panas dan terbakar, seperti haba yang memancar dari dalam.`,
+      },
+    },
+  },
+  zh: {
+    appTitle: "疼痛问卷",
+    appDesc: "以视觉方式描述您的疼痛，帮助翻译员更准确地向医生说明。",
+    start: "开始",
+    next: "下一步 →",
+    back: "← 返回",
+    seeSummary: "查看摘要 →",
+    startAgain: "重新开始",
+
+    // Step labels
+    stepOnset: "第1步 · 选择疼痛日期",
+    stepArea: "第2步 · 选择疼痛部位",
+    stepType: "第3步 · 选择疼痛类型",
+    stepIntensity: "第4步 · 选择疼痛强度",
+    stepSummary: "第5步 · 疼痛摘要",
+
+    // BodySelector
+    selectBodyPart: "哪里疼痛？",
+    tapBodyPart: "触摸身体上感到疼痛的部位",
+    comingSoon: "即将推出 — 目前仅可选择头部",
+    tapHead: "点击头部继续",
+
+    // HeadSelector
+    whereDoesItHurt: "头部哪个部位疼痛？",
+    selectArea: "在图示上点击疼痛部位",
+    selected: "已选",
+    tapToSelect: "点击部位进行选择",
+    selectedAreas: "已选部位",
+    selectAll: "全选",
+    unknownArea: "不确定",
+
+    // Head regions
+    top: "头顶", forehead: "前额",
+    leftTemple: "左太阳穴", rightTemple: "右太阳穴",
+    leftEye: "左眼区域", rightEye: "右眼区域",
+    backNeck: "后颈",
+
+    // Body regions (3D selector)
+    head: "头部",
+    front_torso: "前面（胸部和腹部）",
+    back_torso: "背部",
+    right_hand: "右臂／手",
+    left_hand: "左臂／手",
+    hip: "髋部／骨盆",
+    right_leg: "右腿",
+    left_leg: "左腿",
+
+    // PainTypeSelector
+    whatKindOfPain: "是哪种疼痛？",
+    selectType: "选择最接近的类型",
+    tapPainType: "点击疼痛类型",
+    throbbing:  "搏动性疼痛",
+    stabbing:   "刺痛",
+    splitting:  "裂开样疼痛",
+    squeezing:  "紧压感",
+    heavy:      "沉重感",
+    aching:     "酸痛",
+    cold_sharp:      "冷刺感",
+    dull_foggy:      "迟钝／昏沉",
+    dizzy:           "头晕",
+    aching_stabbing: "酸痛／刺痛",
+    sharp_pain:      "麻刺感",
+    fever:           "灼热感",
+
+    // IntensitySlider
+    howIntense: "疼痛有多强烈？",
+    dragSlider: "拖动滑块",
+    noPain: "无疼痛", littlePain: "轻微疼痛", worstPain: "极度疼痛",
+    pastLabel: "← 过去", nowLabel: "现在 →", daysUnit: "天前",
+    mild: "轻微", moderate: "中度", severe: "严重", verySevere: "极严重",
+
+    // Gender
+    genderLabel: "性别",
+    gender_male: "男",
+    gender_female: "女",
+
+    // Onset
+    whenDidItStart: "疼痛是什么时候开始的？",
+    selectOnset: "选择最接近的选项",
+    onset_today: "今天",
+    onset_1to3days: "1–3天",
+    onset_1week: "约1周",
+    onset_2to3weeks: "2–3周",
+    onset_1month: "1个月以上",
+    onset_2months: "2个月",
+    onset_3months: "3个月",
+    onset_4months: "4个月",
+    onset_5months: "5个月",
+    onset_6months_plus: "6个月以上",
+    painOnset: "疼痛开始",
+    painTrend: "变化趋势",
+
+    // SummaryCard
+    painSummary: "疼痛摘要",
+    reviewShare: "与翻译员一起确认",
+    painLocation: "疼痛部位",
+    painType: "疼痛类型",
+    intensity: "疼痛强度",
+    expressionTitle: "如何描述",
+    medicalTerm: "医学术语",
+    koreanExpr: "使用的表达",
+    shareBtn: "完成",
+    editBtn: "编辑",
+    disclaimer: "这不是医疗诊断。仅供翻译员参考。",
+    sessionNoteLabel: "附加备注（可选）",
+    sessionNotePlaceholder: "例：今早服药，晚上疼痛加剧…",
+    downloadPdf: "下载摘要PDF",
+    pdfDownloaded: "summary.pdf 已下载",
+
+    // PainSetupScreen
+    painSetupTitle: "疼痛史",
+    painSetupSub: "何时开始，如何变化？",
+    painPatternTitle: "疼痛如何变化？",
+    pattern_same: "大致相同",
+    pattern_worse: "越来越严重",
+    pattern_better: "逐渐好转",
+    pattern_fluctuating: "时好时坏",
+    pattern_same_desc: "从开始到现在基本相同",
+    pattern_worse_desc: "逐渐或突然加重",
+    pattern_better_desc: "随时间逐渐改善",
+    pattern_fluctuating_desc: "时有时无／有变化",
+
+    // TimelineEditor
+    timelineTitle: "疼痛强度时间线",
+    timelineSub: "拖动节点调整强度",
+    timelineNodeLabel: "点击节点添加详情",
+    addNode: "+ 添加时间点",
+    removeNode: "删除",
+    nodeEditorTitle: "此时间点的详情",
+    memoPlaceholder: "可选备注（例：服药后）",
+    memoLabel: "备注",
+    done: "完成",
+    timeStart: "开始",
+    timeNow: "现在",
+    timeMid: "中间",
+
+    anotherAreaQ: "还有其他部位疼痛吗？",
+    addAnotherArea: "+ 添加其他部位",
+    pastRecords: "历史记录",
+    noRecords: "没有保存的记录",
+    entryLabel: "疼痛部位",
+
+    sameAreaAsAbove: "使用与上次相同的部位",
+
+    // Data consent modal
+    consentTitle: "匿名疼痛数据授权",
+    consentDesc: "本服务可能收集匿名疼痛数据，用于未来研究及服务改进。",
+    consentCollects: "我们收集的信息：",
+    consentCollectsList: ["疼痛开始日期", "疼痛变化模式", "疼痛部位", "疼痛类型", "疼痛强度"],
+    consentNotCollects: "我们不收集的信息：",
+    consentNotCollectsList: ["姓名", "联系方式", "身份证号码", "详细地址", "医院名称", "任何可识别个人身份的信息"],
+    consentNote: "收集的数据仅用于统计分析和服务改进。",
+    consentCanDecline: "即使拒绝，您仍可继续使用本服务。",
+    consentQuestion: "您是否同意使用匿名疼痛数据？",
+    consentAgree: "我同意",
+    consentDecline: "我不同意",
+
+    medicalExpressions: {
+      throbbing: {
+        medical: "搏动性疼痛",
+        phrase: (loc) => `${loc}像心跳一样搏动，每次跳动都会加剧疼痛。`,
+      },
+      stabbing: {
+        medical: "刺痛 / 锐痛",
+        phrase: (loc) => `${loc}突然出现尖锐的刺痛感。`,
+      },
+      splitting: {
+        medical: "爆裂性 / 裂开样疼痛",
+        phrase: (loc) => `${loc}感觉像是即将爆裂或裂开。`,
+      },
+      squeezing: {
+        medical: "收缩性 / 紧张型疼痛",
+        phrase: (loc) => `${loc}感觉像是被紧紧挤压或抓握。`,
+      },
+      heavy: {
+        medical: "头部沉重感 / 压迫性疼痛",
+        phrase: (loc) => `${loc}感觉非常沉重，像有重物压着。`,
+      },
+      aching: {
+        medical: "深部躯体性疼痛 / 肌痛",
+        phrase: (loc) => `${loc}深处有持续的酸痛感。`,
+      },
+      cold_sharp: {
+        medical: "冷性异常性疼痛 / 神经性过敏",
+        phrase: (loc) => `${loc}感觉冰冷、麻木、尖锐敏感——像冰冷的刺痛。`,
+      },
+      dull_foggy: {
+        medical: "头部沉重感 / 脑雾",
+        phrase: (loc) => `${loc}感觉迟钝而昏沉，像一片厚重的云雾散不去。`,
+      },
+      dizzy: {
+        medical: "眩晕 / 与头晕相关的疼痛",
+        phrase: (loc) => `${loc}周围有旋转、眩晕的感觉，难以集中注意力。`,
+      },
+      aching_stabbing: {
+        medical: "深部躯体性疼痛 / 锐痛",
+        phrase: (loc) => `${loc}深处有持续的酸痛感，并伴随突发的尖锐刺痛。`,
+      },
+      sharp_pain: {
+        medical: "感觉异常 / 电击样疼痛",
+        phrase: (loc) => `${loc}有尖锐的电击麻刺感——像突然的触电或针刺感。`,
+      },
+      fever: {
+        medical: "灼烧痛 / 热性疼痛",
+        phrase: (loc) => `${loc}感觉火热灼烧，像从内部散发出的热量。`,
       },
     },
   },
