@@ -74,13 +74,15 @@ body {
     0 40px 80px rgba(0, 0, 0, 0.6);
 }
 
-/* ── 노트북/데스크톱: 폰 프레임 제거, 깔끔한 카드 ──────── */
+/* ── 노트북/데스크톱: 자연스러운 폰 비율 카드 ────────── */
 @media (min-width: 1025px) {
   #root {
-    width: 430px;
-    height: min(860px, 94dvh);
-    border-radius: 20px;
-    box-shadow: 0 20px 64px rgba(0, 0, 0, 0.5);
+    width: 390px;
+    height: min(844px, 96dvh);
+    border-radius: 44px;
+    box-shadow:
+      0 30px 70px rgba(0, 0, 0, 0.45),
+      0 10px 26px rgba(0, 0, 0, 0.22);
   }
 }
 

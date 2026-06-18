@@ -1,3 +1,11 @@
+// Korean subject particle: "이" after consonant, "가" after vowel
+const p = (s) => {
+  if (!s) return '';
+  const c = s.charCodeAt(s.length - 1);
+  if (c < 0xAC00 || c > 0xD7A3) return '이(가)';
+  return (c - 0xAC00) % 28 !== 0 ? '이' : '가';
+};
+
 const translations = {
   en: {
     appTitle: "Pain Questionnaire",
@@ -29,6 +37,7 @@ const translations = {
     selectedAreas: "Selected",
     selectAll: "Select All",
     unknownArea: "Not sure",
+    headAll: "Entire Head",
 
     // Head regions
     top: "Crown", forehead: "Forehead",
@@ -159,57 +168,81 @@ const translations = {
     medicalExpressions: {
       throbbing: {
         medical: "Pulsating / Throbbing pain",
-        phrase: (loc) => `The ${loc} throbs like a heartbeat and gets worse with each pulse.`,
+        phrase: (loc) => loc
+          ? `The ${loc} throbs like a heartbeat and gets worse with each pulse.`
+          : `The pain throbs like a heartbeat and gets worse with each pulse.`,
       },
       stabbing: {
         medical: "Stabbing / Lancinating pain",
-        phrase: (loc) => `There is a sudden, sharp stabbing sensation in the ${loc}.`,
+        phrase: (loc) => loc
+          ? `There is a sudden, sharp stabbing sensation in the ${loc}.`
+          : `There is a sudden, sharp stabbing sensation, though the exact location is unclear.`,
       },
       splitting: {
-        medical: "Explosive / Splitting pain",
-        phrase: (loc) => `The ${loc} feels like it is about to burst or split apart.`,
+        medical: "Severe / Splitting headache",
+        phrase: (loc) => loc
+          ? `The ${loc} feels like it is about to burst or split apart.`
+          : `The head feels like it is about to burst or split apart.`,
       },
       squeezing: {
         medical: "Constricting / Tension-type pain",
-        phrase: (loc) => `The ${loc} feels like it is being tightly squeezed or gripped.`,
+        phrase: (loc) => loc
+          ? `The ${loc} feels like it is being squeezed or pressed.`
+          : `The head feels like it is being squeezed or pressed.`,
       },
       heavy: {
         medical: "Cephalic heaviness / Pressure pain",
-        phrase: (loc) => `The ${loc} feels extremely heavy, like a weight pressing down on it.`,
+        phrase: (loc) => loc
+          ? `The ${loc} feels heavy and weighed down.`
+          : `The head feels heavy and weighed down.`,
       },
       aching: {
-        medical: "Deep somatic pain / Myalgia",
-        phrase: (loc) => `There is a deep, persistent aching sensation spreading through the ${loc}.`,
+        medical: "Dull aching headache",
+        phrase: (loc) => loc
+          ? `There is a deep, persistent aching sensation in the ${loc}.`
+          : `There is a deep, persistent aching sensation, though the exact location is unclear.`,
       },
       cold_sharp: {
         medical: "Cold allodynia / Neuropathic sensitivity",
-        phrase: (loc) => `The ${loc} feels cold, numb, and sharply sensitive — like an ice-cold sting.`,
+        phrase: (loc) => loc
+          ? `The ${loc} feels cold, numb, and tingly — like an ice-cold sting.`
+          : `The area feels cold, numb, and tingly — like an ice-cold sting.`,
       },
       dull_foggy: {
-        medical: "Cephalic heaviness / Brain fog",
-        phrase: (loc) => `The ${loc} feels dull and foggy, like a heavy cloud that won't clear.`,
+        medical: "Brain fog / Cognitive dullness",
+        phrase: (loc) => loc
+          ? `The ${loc} feels dull and foggy, like a heavy haze.`
+          : `The head feels dull and foggy, like a heavy haze.`,
       },
       dizzy: {
         medical: "Vertigo / Dizziness-associated pain",
-        phrase: (loc) => `There is a spinning, dizzy feeling around the ${loc}, making it hard to focus.`,
+        phrase: (loc) => loc
+          ? `There is a spinning, dizzy feeling around the ${loc}, making it hard to focus.`
+          : `There is a spinning, dizzy feeling making it hard to focus.`,
       },
       aching_stabbing: {
-        medical: "Deep somatic pain / Lancinating pain",
-        phrase: (loc) => `The ${loc} has a deep, persistent aching sensation combined with sudden sharp stabbing episodes.`,
+        medical: "Dull aching / Stabbing headache",
+        phrase: (loc) => loc
+          ? `The ${loc} has a persistent deep ache with occasional sharp stabbing episodes.`
+          : `There is a persistent deep ache with occasional sharp stabbing episodes.`,
       },
       sharp_pain: {
         medical: "Paresthesia / Electric-type pain",
-        phrase: (loc) => `The ${loc} has a sharp, electric tingling sensation — like a sudden jolt or pins and needles.`,
+        phrase: (loc) => loc
+          ? `The ${loc} has a sharp, electric tingling sensation — like a sudden jolt or pins and needles.`
+          : `There is a sharp, electric tingling sensation — like a sudden jolt or pins and needles.`,
       },
       fever: {
         medical: "Burning / Thermal pain",
-        phrase: (loc) => `The ${loc} feels hot and burning, like intense heat radiating from within.`,
+        phrase: (loc) => loc
+          ? `The ${loc} feels hot and burning, like heat radiating from within.`
+          : `The area feels hot and burning, like heat radiating from within.`,
       },
     },
   },
 
   ko: {
-    appTitle: "통증 문진표",
+    appTitle: "통증 문진 서비스",
     appDesc: "통증을 시각적으로 표현해서 통역사가 의사에게 더 정확하게 전달할 수 있도록 도와줍니다.",
     start: "시작하기",
     next: "다음 →",
@@ -238,6 +271,7 @@ const translations = {
     selectedAreas: "선택한 부위",
     selectAll: "전체 선택",
     unknownArea: "모르겠음",
+    headAll: "머리 전체",
 
     // Head regions
     top: "정수리", forehead: "이마",
@@ -367,52 +401,76 @@ const translations = {
 
     medicalExpressions: {
       throbbing: {
-        medical: "박동성 통증 (搏動性痛)",
-        phrase: (loc) => `${loc}이(가) 심장 박동처럼 욱신욱신 뛰어요. 맥박이 느껴질 때마다 더 심해지는 것 같아요.`,
+        medical: "박동성 두통 (搏動性 頭痛)",
+        phrase: (loc) => loc
+          ? `${loc}${p(loc)} 심장 박동처럼 욱신욱신 뛰어요.`
+          : `어디인지 확실하진 않지만 심장 박동처럼 욱신욱신 뛰어요.`,
       },
       stabbing: {
-        medical: "자통 (刺痛)",
-        phrase: (loc) => `${loc}에 갑자기 날카롭게 찌르는 느낌이 와요.`,
+        medical: "자통성 두통 (刺痛性 頭痛)",
+        phrase: (loc) => loc
+          ? `${loc}에 갑자기 날카롭게 찌르는 느낌이 있어요.`
+          : `어딘가에 갑자기 날카롭게 찌르는 느낌이 있어요.`,
       },
       splitting: {
-        medical: "폭발성 두통 / 뇌압 상승성 통증",
-        phrase: (loc) => `${loc}이(가) 당장이라도 깨질 것처럼 터질 듯이 아파요.`,
+        medical: "심한 두통 / 압박성 통증",
+        phrase: (loc) => loc
+          ? `${loc}${p(loc)} 쪼개질 듯이 아파요.`
+          : `머리가 쪼개질 듯이 아파요.`,
       },
       squeezing: {
         medical: "긴장성 두통 (수축형)",
-        phrase: (loc) => `${loc}이(가) 꽉 조이거나 틀어쥐는 것처럼 아파요.`,
+        phrase: (loc) => loc
+          ? `${loc}${p(loc)} 조이거나 누르는 느낌이에요.`
+          : `머리가 조이거나 누르는 느낌이에요.`,
       },
       heavy: {
         medical: "두중감 (頭重感)",
-        phrase: (loc) => `${loc}이(가) 납덩이처럼 무겁고 짓누르는 느낌이에요.`,
+        phrase: (loc) => loc
+          ? `${loc}${p(loc)} 무겁고 눌리는 느낌이에요.`
+          : `머리가 무겁고 눌리는 느낌이에요.`,
       },
       aching: {
-        medical: "심부통 (深部痛) / 근육통",
-        phrase: (loc) => `${loc} 깊은 곳에서 쑤시고 저리는 느낌이 지속돼요.`,
+        medical: "둔통성 두통 (鈍痛性 頭痛)",
+        phrase: (loc) => loc
+          ? `${loc} 깊은 곳에서 묵직하게 쑤시는 느낌이 지속돼요.`
+          : `어딘가 깊은 곳에서 묵직하게 쑤시는 느낌이 지속돼요.`,
       },
       cold_sharp: {
-        medical: "한랭 이질통 / 신경과민성 통증",
-        phrase: (loc) => `${loc}이(가) 시리고 차갑게 저리는 느낌이에요. 마치 얼음에 닿은 것처럼요.`,
+        medical: "신경성 두통 / 냉각 과민통",
+        phrase: (loc) => loc
+          ? `${loc}${p(loc)} 시리고 차갑게 저리는 느낌이에요.`
+          : `머리가 시리고 차갑게 저리는 느낌이에요.`,
       },
       dull_foggy: {
-        medical: "두중감 / 뇌 혼탁",
-        phrase: (loc) => `${loc}이(가) 띵하고 멍한 느낌이에요. 머리에 안개가 낀 것 같아요.`,
+        medical: "긴장형 두통 / 인지 기능 저하",
+        phrase: (loc) => loc
+          ? `${loc}${p(loc)} 전반적으로 띵하고 멍한 느낌이에요.`
+          : `머리가 전반적으로 띵하고 멍한 느낌이에요.`,
       },
       dizzy: {
         medical: "현훈 (眩暈) / 두통성 어지럼증",
-        phrase: (loc) => `${loc} 쪽이 어지럽고 빙글빙글 도는 느낌이에요. 집중하기 힘들어요.`,
+        phrase: (loc) => loc
+          ? `${loc} 쪽이 어지럽고 빙글빙글 도는 느낌이에요.`
+          : `어지럽고 빙글빙글 도는 느낌이에요.`,
       },
       aching_stabbing: {
-        medical: "심부통 (深部痛) / 자통 (刺痛)",
-        phrase: (loc) => `${loc} 깊은 곳에서 쑤시는 느낌이 지속되다가 가끔씩 날카롭게 찌르는 통증이 와요.`,
+        medical: "둔통 · 자통 혼합형 두통",
+        phrase: (loc) => loc
+          ? `${loc} 깊은 곳에서 쑤시는 느낌이 있다가 가끔씩 날카롭게 찌르는 통증이 와요.`
+          : `묵직하게 쑤시는 느낌이 있다가 가끔씩 날카롭게 찌르는 통증이 와요.`,
       },
       sharp_pain: {
-        medical: "감각이상 (感覺異常) / 전기성 통증",
-        phrase: (loc) => `${loc}에 전기가 오는 것처럼 찌릿찌릿한 느낌이에요.`,
+        medical: "감각이상 (感覺異常) / 신경통",
+        phrase: (loc) => loc
+          ? `${loc}에 전기가 오는 것처럼 찌릿찌릿한 느낌이에요.`
+          : `어딘가에 전기가 오는 것처럼 찌릿찌릿한 느낌이에요.`,
       },
       fever: {
-        medical: "작열통 (灼熱痛) / 열성 통증",
-        phrase: (loc) => `${loc}이(가) 불에 타는 것처럼 뜨겁고 화끈거려요.`,
+        medical: "작열통 (灼熱痛)",
+        phrase: (loc) => loc
+          ? `${loc}${p(loc)} 뜨겁고 화끈거리는 느낌이에요.`
+          : `머리가 뜨겁고 화끈거리는 느낌이에요.`,
       },
     },
   },
@@ -447,6 +505,7 @@ const translations = {
     selectedAreas: "Kawasan dipilih",
     selectAll: "Pilih Semua",
     unknownArea: "Tidak pasti",
+    headAll: "Keseluruhan Kepala",
 
     // Head regions
     top: "Ubun-ubun", forehead: "Dahi",
@@ -577,51 +636,75 @@ const translations = {
     medicalExpressions: {
       throbbing: {
         medical: "Sakit berdenyut",
-        phrase: (loc) => `${loc} berdenyut seperti degupan jantung dan semakin teruk dengan setiap denyutan.`,
+        phrase: (loc) => loc
+          ? `${loc} berdenyut seperti degupan jantung dan semakin teruk dengan setiap denyutan.`
+          : `Kesakitan berdenyut seperti degupan jantung dan semakin teruk dengan setiap denyutan.`,
       },
       stabbing: {
         medical: "Sakit menusuk tajam",
-        phrase: (loc) => `Ada sensasi menusuk yang tajam dan tiba-tiba di ${loc}.`,
+        phrase: (loc) => loc
+          ? `Ada sensasi menusuk yang tajam dan tiba-tiba di ${loc}.`
+          : `Ada sensasi menusuk yang tajam dan tiba-tiba, walaupun kawasan tepat tidak pasti.`,
       },
       splitting: {
-        medical: "Sakit membelah / tekanan intrakranial",
-        phrase: (loc) => `${loc} terasa seperti hendak pecah atau terbelah.`,
+        medical: "Sakit kepala teruk / tekanan",
+        phrase: (loc) => loc
+          ? `${loc} terasa seperti hendak pecah atau terbelah.`
+          : `Kepala terasa seperti hendak pecah atau terbelah.`,
       },
       squeezing: {
         medical: "Sakit kepala ketegangan (mengetat)",
-        phrase: (loc) => `${loc} terasa seperti diperah atau diikat dengan ketat.`,
+        phrase: (loc) => loc
+          ? `${loc} terasa seperti diperah atau ditekan.`
+          : `Kepala terasa seperti diperah atau ditekan.`,
       },
       heavy: {
         medical: "Rasa berat di kepala",
-        phrase: (loc) => `${loc} terasa sangat berat, seperti ada beban yang menekan.`,
+        phrase: (loc) => loc
+          ? `${loc} terasa berat dan tertekan.`
+          : `Kepala terasa berat dan tertekan.`,
       },
       aching: {
-        medical: "Sakit dalam / mialgia",
-        phrase: (loc) => `Ada rasa sengal yang dalam dan berterusan di ${loc}.`,
+        medical: "Sakit kepala tumpul / berterusan",
+        phrase: (loc) => loc
+          ? `Ada rasa sengal yang dalam dan berterusan di ${loc}.`
+          : `Ada rasa sengal yang dalam dan berterusan, walaupun kawasan tepat tidak pasti.`,
       },
       cold_sharp: {
         medical: "Alodinia sejuk / sensitiviti neuropatik",
-        phrase: (loc) => `${loc} terasa ngilu dan sejuk seperti terkena ais yang tajam.`,
+        phrase: (loc) => loc
+          ? `${loc} terasa ngilu dan sejuk seperti terkena ais.`
+          : `Kawasan tersebut terasa ngilu dan sejuk seperti terkena ais.`,
       },
       dull_foggy: {
-        medical: "Rasa berat kepala / kabus otak",
-        phrase: (loc) => `${loc} terasa kebas dan kabur, seperti ada kabus yang tidak hilang.`,
+        medical: "Kabus otak / Penurunan tumpuan",
+        phrase: (loc) => loc
+          ? `${loc} terasa kebas dan kabur, seperti ada kabus yang tidak hilang.`
+          : `Kepala terasa kebas dan kabur, seperti ada kabus yang tidak hilang.`,
       },
       dizzy: {
         medical: "Vertigo / pening berkaitan sakit",
-        phrase: (loc) => `Ada rasa pening dan berpusing di sekitar ${loc}, sukar untuk fokus.`,
+        phrase: (loc) => loc
+          ? `Ada rasa pening dan berpusing di sekitar ${loc}, sukar untuk fokus.`
+          : `Ada rasa pening dan berpusing, sukar untuk fokus.`,
       },
       aching_stabbing: {
-        medical: "Sakit dalam / sakit menusuk",
-        phrase: (loc) => `${loc} terasa sengal yang dalam dan berterusan, diselangi dengan episod menusuk yang tajam.`,
+        medical: "Sakit kepala tumpul dan menusuk",
+        phrase: (loc) => loc
+          ? `${loc} terasa sengal yang dalam dan berterusan, diselangi dengan episod menusuk yang tajam.`
+          : `Ada rasa sengal yang dalam dan berterusan, diselangi dengan episod menusuk yang tajam.`,
       },
       sharp_pain: {
         medical: "Parestesia / Sakit jenis elektrik",
-        phrase: (loc) => `${loc} terasa seperti kesemutan elektrik yang tajam — seperti renjatan tiba-tiba atau jarum menusuk.`,
+        phrase: (loc) => loc
+          ? `${loc} terasa seperti kesemutan elektrik — seperti renjatan tiba-tiba atau jarum menusuk.`
+          : `Ada rasa kesemutan elektrik — seperti renjatan tiba-tiba atau jarum menusuk.`,
       },
       fever: {
         medical: "Sakit terbakar / Sakit terma",
-        phrase: (loc) => `${loc} terasa panas dan terbakar, seperti haba yang memancar dari dalam.`,
+        phrase: (loc) => loc
+          ? `${loc} terasa panas dan terbakar, seperti haba yang memancar dari dalam.`
+          : `Kawasan tersebut terasa panas dan terbakar, seperti haba yang memancar dari dalam.`,
       },
     },
   },
@@ -655,6 +738,7 @@ const translations = {
     selectedAreas: "已选部位",
     selectAll: "全选",
     unknownArea: "不确定",
+    headAll: "整个头部",
 
     // Head regions
     top: "头顶", forehead: "前额",
@@ -784,52 +868,76 @@ const translations = {
 
     medicalExpressions: {
       throbbing: {
-        medical: "搏动性疼痛",
-        phrase: (loc) => `${loc}像心跳一样搏动，每次跳动都会加剧疼痛。`,
+        medical: "搏动性头痛",
+        phrase: (loc) => loc
+          ? `${loc}像心跳一样搏动，每次跳动都会加剧疼痛。`
+          : `疼痛像心跳一样搏动，每次跳动都会加剧。`,
       },
       stabbing: {
         medical: "刺痛 / 锐痛",
-        phrase: (loc) => `${loc}突然出现尖锐的刺痛感。`,
+        phrase: (loc) => loc
+          ? `${loc}突然出现尖锐的刺痛感。`
+          : `某处突然出现尖锐的刺痛感，但具体位置不确定。`,
       },
       splitting: {
-        medical: "爆裂性 / 裂开样疼痛",
-        phrase: (loc) => `${loc}感觉像是即将爆裂或裂开。`,
+        medical: "剧烈头痛 / 压裂感",
+        phrase: (loc) => loc
+          ? `${loc}感觉像是即将爆裂或裂开。`
+          : `头部感觉像是即将爆裂或裂开。`,
       },
       squeezing: {
         medical: "收缩性 / 紧张型疼痛",
-        phrase: (loc) => `${loc}感觉像是被紧紧挤压或抓握。`,
+        phrase: (loc) => loc
+          ? `${loc}感觉像是被挤压或按压着。`
+          : `头部感觉像是被挤压或按压着。`,
       },
       heavy: {
         medical: "头部沉重感 / 压迫性疼痛",
-        phrase: (loc) => `${loc}感觉非常沉重，像有重物压着。`,
+        phrase: (loc) => loc
+          ? `${loc}感觉沉重，像有重物压着。`
+          : `头部感觉沉重，像有重物压着。`,
       },
       aching: {
-        medical: "深部躯体性疼痛 / 肌痛",
-        phrase: (loc) => `${loc}深处有持续的酸痛感。`,
+        medical: "钝痛性头痛 / 持续性头痛",
+        phrase: (loc) => loc
+          ? `${loc}深处有持续的酸痛感。`
+          : `某处深部有持续的酸痛感，但具体位置不确定。`,
       },
       cold_sharp: {
         medical: "冷性异常性疼痛 / 神经性过敏",
-        phrase: (loc) => `${loc}感觉冰冷、麻木、尖锐敏感——像冰冷的刺痛。`,
+        phrase: (loc) => loc
+          ? `${loc}感觉冰冷、麻木、刺痛——像冰冷的刺激。`
+          : `该区域感觉冰冷、麻木、刺痛——像冰冷的刺激。`,
       },
       dull_foggy: {
-        medical: "头部沉重感 / 脑雾",
-        phrase: (loc) => `${loc}感觉迟钝而昏沉，像一片厚重的云雾散不去。`,
+        medical: "脑雾 / 注意力下降",
+        phrase: (loc) => loc
+          ? `${loc}感觉迟钝而昏沉，像一片云雾散不去。`
+          : `头部感觉迟钝而昏沉，像一片云雾散不去。`,
       },
       dizzy: {
         medical: "眩晕 / 与头晕相关的疼痛",
-        phrase: (loc) => `${loc}周围有旋转、眩晕的感觉，难以集中注意力。`,
+        phrase: (loc) => loc
+          ? `${loc}周围有旋转、眩晕的感觉，难以集中注意力。`
+          : `有旋转、眩晕的感觉，难以集中注意力。`,
       },
       aching_stabbing: {
-        medical: "深部躯体性疼痛 / 锐痛",
-        phrase: (loc) => `${loc}深处有持续的酸痛感，并伴随突发的尖锐刺痛。`,
+        medical: "钝痛 / 刺痛混合型头痛",
+        phrase: (loc) => loc
+          ? `${loc}深处有持续的酸痛感，并伴随突发的尖锐刺痛。`
+          : `有持续的深部酸痛感，并伴随突发的尖锐刺痛。`,
       },
       sharp_pain: {
         medical: "感觉异常 / 电击样疼痛",
-        phrase: (loc) => `${loc}有尖锐的电击麻刺感——像突然的触电或针刺感。`,
+        phrase: (loc) => loc
+          ? `${loc}有尖锐的电击麻刺感——像突然的触电或针刺感。`
+          : `有尖锐的电击麻刺感——像突然的触电或针刺感。`,
       },
       fever: {
         medical: "灼烧痛 / 热性疼痛",
-        phrase: (loc) => `${loc}感觉火热灼烧，像从内部散发出的热量。`,
+        phrase: (loc) => loc
+          ? `${loc}感觉发热灼烧，像从内部散发出的热量。`
+          : `该区域感觉发热灼烧，像从内部散发出的热量。`,
       },
     },
   },

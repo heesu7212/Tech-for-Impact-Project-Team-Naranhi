@@ -49,8 +49,15 @@ export default function BodySelector({ onNext, onBack, setPainData, t }) {
     );
   };
 
+  const handleSelectAll = () => {
+    setHeadSelected((prev) =>
+      prev.length === HEAD_ZONE_IDS.length ? [] : [...HEAD_ZONE_IDS]
+    );
+  };
+
   const handleHeadConfirm = () => {
-    setPainData((prev) => ({ ...prev, location: headSelected }));
+    const loc = headSelected.length === HEAD_ZONE_IDS.length ? ["all"] : headSelected;
+    setPainData((prev) => ({ ...prev, location: loc }));
     onNext("head");
   };
 
@@ -174,6 +181,32 @@ export default function BodySelector({ onNext, onBack, setPainData, t }) {
         <div style={{ padding: "8px 16px 16px", flexShrink: 0 }}>
 
           <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", marginBottom: "10px" }}>
+            {/* 전체 선택 chip */}
+            {(() => {
+              const isAllSel = headSelected.length === HEAD_ZONE_IDS.length;
+              return (
+                <button
+                  onClick={handleSelectAll}
+                  style={{
+                    display: "flex", alignItems: "center", gap: "5px",
+                    padding: "5px 11px", borderRadius: "14px",
+                    border: `1.5px solid ${isAllSel ? "#7C3AED" : "#E5E7EB"}`,
+                    backgroundColor: isAllSel ? "#7C3AED20" : "#F9FAFB",
+                    color: isAllSel ? "#7C3AED" : "#A0AEC0",
+                    fontSize: "11px", fontWeight: isAllSel ? "700" : "400",
+                    cursor: "pointer", transition: "all 0.15s",
+                    boxShadow: isAllSel ? "0 0 0 2px #7C3AED30" : "none",
+                  }}
+                >
+                  <span style={{
+                    width: "7px", height: "7px", borderRadius: "50%", flexShrink: 0,
+                    backgroundColor: isAllSel ? "#7C3AED" : "#D1D5DB",
+                    transition: "background-color 0.15s",
+                  }} />
+                  {t.selectAll}
+                </button>
+              );
+            })()}
             {HEAD_ZONE_IDS.map((id) => {
               const isSel = headSelected.includes(id);
               const chipColor = ZONE_COLORS[id] || "#7C3AED";

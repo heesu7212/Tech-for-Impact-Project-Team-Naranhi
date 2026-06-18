@@ -253,7 +253,9 @@ function MiniEntryCard({ entry, index, t, totalEntries, isTimeline, timelineEven
   const firstType = PAIN_TYPES.find(p => p.id === (painTypes?.[0]));
   const locationLabel = location?.includes("unknown")
     ? t.unknownArea
-    : (location?.map(k => t[k]).join(", ") || "—");
+    : location?.includes("all")
+      ? t.headAll
+      : (location?.map(k => t[k]).join(", ") || "—");
 
   // 타임라인 모드: 노드 강도 흐름 표시 (예: 3→7)
   const timelineLabel = isTimeline && timelineEvents?.length > 0
@@ -309,59 +311,107 @@ function MiniEntryCard({ entry, index, t, totalEntries, isTimeline, timelineEven
 
 // ─── Start Screen ───────────────────────────────────────────
 function StartScreen({ onNext, t }) {
-  const [history] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("pain-app-sessions") || "[]"); }
-    catch { return []; }
-  });
-
-  const formatDate = (iso) => {
-    const d = new Date(iso);
-    return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
-  };
-
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflowY: "auto" }}>
+    <div style={{
+      display: "flex", flexDirection: "column", alignItems: "center",
+      justifyContent: "center", height: "100%",
+      background: "#fff",
+      padding: "40px 32px",
+      boxSizing: "border-box",
+      position: "relative", overflow: "hidden",
+    }}>
+
+      {/* Logo */}
       <div style={{
-        display: "flex", flexDirection: "column", alignItems: "center",
-        justifyContent: "center",
-        padding: "40px 28px", textAlign: "center",
-        minHeight: "100%", boxSizing: "border-box",
-        position: "relative",
+        position: "relative", marginBottom: "24px", zIndex: 1,
+        display: "flex", alignItems: "center", justifyContent: "center",
       }}>
         <div style={{
-          width: "80px", height: "80px", borderRadius: "24px",
-          background: "linear-gradient(135deg, #7C3AED, #A855F7)",
+          position: "absolute",
+          left: "50%", top: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "168px", height: "168px", borderRadius: "42px",
+          background: "transparent",
+          border: "1.5px solid rgba(124,58,237,0.20)",
+        }} />
+        <div style={{
+          width: "140px", height: "140px", borderRadius: "36px",
+          background: "#fff",
           display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: "40px", margin: "0 auto 28px",
-          boxShadow: "0 8px 24px rgba(124,58,237,0.4)",
+          boxShadow: "0 8px 32px rgba(107,33,168,0.15)",
+          border: "1.5px solid rgba(124,58,237,0.15)",
+          overflow: "hidden",
         }}>
-          🧠
+          <img
+            src="/logo.png"
+            alt="logo"
+            style={{ width: "100%", height: "100%", objectFit: "contain", transform: "translate(8px, 6px)" }}
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+              e.currentTarget.parentElement.style.background = "rgba(124,58,237,0.08)";
+              e.currentTarget.parentElement.style.fontSize = "54px";
+              e.currentTarget.parentElement.textContent = "🩺";
+            }}
+          />
         </div>
-
-        <h1 style={{ color: "#1F0A3C", fontWeight: "700", fontSize: "26px", margin: "0 0 14px" }}>
-          {t.appTitle}
-        </h1>
-        <p style={{ color: "#6B7280", lineHeight: "1.75", fontSize: "14px", margin: "0 0 40px", maxWidth: "300px", wordBreak: "keep-all" }}>
-          {t.appDesc}
-        </p>
-
-        <button
-          onClick={onNext}
-          style={{
-            padding: "16px 44px", fontSize: "16px", fontWeight: "700",
-            backgroundColor: "#6B21A8", color: "#fff", border: "none",
-            borderRadius: "14px", cursor: "pointer", letterSpacing: "0.3px",
-            boxShadow: "0 4px 18px rgba(107,33,168,0.45)",
-            width: "100%", maxWidth: "280px",
-          }}
-        >
-          {t.start}
-        </button>
-
-
       </div>
 
+      {/* Brand badge */}
+      <div style={{
+        display: "inline-flex", alignItems: "center", gap: "6px",
+        background: "rgba(124,58,237,0.08)", borderRadius: "20px",
+        padding: "4px 12px", marginBottom: "14px", zIndex: 1,
+      }}>
+        <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#7C3AED" }} />
+        <span style={{ fontSize: "10px", fontWeight: "700", color: "#7C3AED", letterSpacing: "1.2px", textTransform: "uppercase" }}>
+          Pain Visualization Tool
+        </span>
+      </div>
 
+      {/* Title */}
+      <h1 style={{
+        fontFamily: "'Noto Sans KR', sans-serif",
+        fontWeight: "800", fontSize: "30px",
+        margin: "0 0 16px", letterSpacing: "-0.5px", lineHeight: 1.25,
+        textAlign: "center", zIndex: 1, color: "#1F0A3C",
+      }}>
+        {t.appTitle}
+      </h1>
+
+      {/* Description */}
+      <p style={{
+        fontFamily: "'Noto Sans KR', sans-serif",
+        color: "#6B7280", lineHeight: "1.7", fontSize: "13px",
+        margin: "0 0 20px", maxWidth: "260px",
+        wordBreak: "keep-all", textAlign: "center", zIndex: 1,
+        fontWeight: "400",
+      }}>
+        {t.appDesc}
+      </p>
+
+      {/* CTA button */}
+      <button
+        onClick={onNext}
+        style={{
+          padding: "17px", fontSize: "16px", fontWeight: "700",
+          background: "linear-gradient(135deg, #7C3AED 0%, #6B21A8 100%)",
+          color: "#fff", border: "none", borderRadius: "16px",
+          cursor: "pointer", width: "100%", maxWidth: "310px",
+          boxShadow: "0 6px 24px rgba(107,33,168,0.35)",
+          letterSpacing: "0.3px", zIndex: 1,
+        }}
+      >
+        {t.start}
+      </button>
+
+      {/* Disclaimer */}
+      <p style={{
+        fontSize: "11px", color: "#C4B5FD",
+        margin: "20px 0 0", textAlign: "center",
+        maxWidth: "270px", lineHeight: 1.6, zIndex: 1,
+      }}>
+        {t.disclaimer}
+      </p>
     </div>
   );
 }
@@ -799,7 +849,9 @@ function EntryBlock({ entry, index, t, totalEntries, dateLabel }) {
   const label = getLabel(intensity);
   const locationLabel = location?.includes("unknown")
     ? t.unknownArea
-    : (location?.map(k => t[k]).join(", ") || "—");
+    : location?.includes("all")
+      ? t.headAll
+      : (location?.map(k => t[k]).join(", ") || "—");
 
   const renderRow = (stepNum, lbl, value, valueColor) => (
     <div style={{
@@ -879,7 +931,7 @@ function EntryBlock({ entry, index, t, totalEntries, dateLabel }) {
                     {t.koreanExpr}
                   </div>
                   <div style={{ fontSize: "14px", color: "#1F0A3C", lineHeight: "1.65" }}>
-                    "{expr.phrase(locationLabel)}"
+                    "{expr.phrase(location?.includes("unknown") ? null : locationLabel)}"
                   </div>
                 </div>
               </div>
@@ -924,10 +976,16 @@ function SummaryCard({ entries, currentEntry, onConsent, onBack, painPattern, ti
     allEntries.forEach((entry, idx) => {
       const locLabelKo = entry.location?.includes("unknown")
         ? tKo.unknownArea
-        : entry.location?.map(k => tKo[k]).join(", ") || "—";
+        : entry.location?.includes("all")
+          ? tKo.headAll
+          : entry.location?.map(k => tKo[k]).join(", ") || "—";
       const locLabelUser = entry.location?.includes("unknown")
         ? t.unknownArea
-        : entry.location?.map(k => t[k]).join(", ") || "—";
+        : entry.location?.includes("all")
+          ? t.headAll
+          : entry.location?.map(k => t[k]).join(", ") || "—";
+      const locPhraseKo = entry.location?.includes("unknown") ? null : locLabelKo;
+      const locPhraseUser = entry.location?.includes("unknown") ? null : locLabelUser;
 
       const typeNamesKo = entry.painTypes?.map(id => tKo[id]).join(", ") || "—";
       const typeNamesUser = entry.painTypes?.map(id => t[id]).join(", ") || "—";
@@ -942,7 +1000,7 @@ function SummaryCard({ entries, currentEntry, onConsent, onBack, painPattern, ti
           if (!exprKo) return "";
           const userPhraseHtml = !isKo && exprUser ? `
             <div style="font-size:12px;color:#4C1D95;line-height:1.6;margin-top:6px;padding-top:6px;border-top:1px dashed #DDD6FE">
-              &ldquo;${exprUser.phrase(locLabelUser)}&rdquo;
+              &ldquo;${exprUser.phrase(locPhraseUser)}&rdquo;
             </div>` : "";
           return `
             <div style="margin-bottom:10px">
@@ -952,7 +1010,7 @@ function SummaryCard({ entries, currentEntry, onConsent, onBack, painPattern, ti
               </div>
               <div style="background:#fff;border-radius:8px;padding:8px 12px;border-left:4px solid #7C3AED">
                 <div style="font-size:10px;color:#7C3AED;font-weight:600;margin-bottom:4px">${tKo.koreanExpr}</div>
-                <div style="font-size:13px;color:#1F0A3C;line-height:1.65">&ldquo;${exprKo.phrase(locLabelKo)}&rdquo;</div>
+                <div style="font-size:13px;color:#1F0A3C;line-height:1.65">&ldquo;${exprKo.phrase(locPhraseKo)}&rdquo;</div>
                 ${userPhraseHtml}
               </div>
             </div>`;
@@ -1115,7 +1173,9 @@ function SummaryCard({ entries, currentEntry, onConsent, onBack, painPattern, ti
           const pts = currentEntry.painTypes || [];
           const locLabel = currentEntry.location?.includes("unknown")
             ? t.unknownArea
-            : (currentEntry.location?.map(k => t[k]).join(", ") || "—");
+            : currentEntry.location?.includes("all")
+              ? t.headAll
+              : (currentEntry.location?.map(k => t[k]).join(", ") || "—");
           if (!pts.length) return null;
           return (
             <div style={{
@@ -1136,7 +1196,7 @@ function SummaryCard({ entries, currentEntry, onConsent, onBack, painPattern, ti
                     </div>
                     <div style={{ backgroundColor: "#fff", borderRadius: "10px", padding: "10px 14px", borderLeft: "4px solid #7C3AED" }}>
                       <div style={{ fontSize: "11px", color: "#7C3AED", fontWeight: "600", marginBottom: "6px" }}>{t.koreanExpr}</div>
-                      <div style={{ fontSize: "14px", color: "#1F0A3C", lineHeight: "1.65" }}>"{expr.phrase(locLabel)}"</div>
+                      <div style={{ fontSize: "14px", color: "#1F0A3C", lineHeight: "1.65" }}>"{expr.phrase(currentEntry.location?.includes("unknown") ? null : locLabel)}"</div>
                     </div>
                   </div>
                 );
@@ -1419,8 +1479,8 @@ function PainSetupScreen({ onNext, onBack, painData, setPainData, onPatternChose
         }}>
           {GENDER_OPTIONS.map(g => {
             const sel = gender === g.key;
-            const selColor = g.key === "male" ? "#6366F1" : "#D946EF";
-            const shadowColor = g.key === "male" ? "rgba(99,102,241,0.35)" : "rgba(217,70,239,0.35)";
+            const selColor = "#7C3AED";
+            const shadowColor = "rgba(124,58,237,0.35)";
             return (
               <button
                 key={g.key}

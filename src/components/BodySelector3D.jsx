@@ -1,6 +1,6 @@
 import { Suspense, useRef, useMemo, useEffect } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, useGLTF } from "@react-three/drei";
+import { OrbitControls, useGLTF, RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
 
 const MODEL_PATH =
@@ -30,19 +30,15 @@ export const BODY_ZONES = [
   { id: "left_leg",    pos: [0.12,  -0.57,   0],    size: [0.17,  0.60,  0.14] },
 ];
 
-// ─── 7 head zone slabs — all thin-slab style like "top" ──────
+// ─── 7 head zones ─────────────────────────────────────────────
 const HEAD_ZONES = [
-  // horizontal slab — crown
-  { id: "top",         pos: [0,       0.991,  0     ], size: [0.190, 0.028, 0.190] },
-  // front-facing slabs
-  { id: "forehead",    pos: [0,       0.920,  0.111 ], size: [0.155, 0.075, 0.026] },
-  { id: "leftEye",     pos: [-0.065,  0.874,  0.104 ], size: [0.068, 0.042, 0.026] },
-  { id: "rightEye",    pos: [ 0.065,  0.874,  0.104 ], size: [0.068, 0.042, 0.026] },
-  // side-facing slabs
-  { id: "leftTemple",  pos: [-0.099,  0.886,  0.010 ], size: [0.026, 0.090, 0.095] },
-  { id: "rightTemple", pos: [ 0.099,  0.886,  0.010 ], size: [0.026, 0.090, 0.095] },
-  // back-facing slab — moved up, wider
-  { id: "backNeck",    pos: [0,       0.905, -0.106 ], size: [0.215, 0.075, 0.026] },
+  { id: "top",         pos: [0,       0.991,  0     ], size: [0.190, 0.048, 0.190] },
+  { id: "forehead",    pos: [0,       0.920,  0.111 ], size: [0.155, 0.075, 0.048] },
+  { id: "leftEye",     pos: [-0.065,  0.874,  0.104 ], size: [0.070, 0.044, 0.048] },
+  { id: "rightEye",    pos: [ 0.065,  0.874,  0.104 ], size: [0.070, 0.044, 0.048] },
+  { id: "leftTemple",  pos: [-0.099,  0.886,  0.010 ], size: [0.048, 0.090, 0.095] },
+  { id: "rightTemple", pos: [ 0.099,  0.886,  0.010 ], size: [0.048, 0.090, 0.095] },
+  { id: "backNeck",    pos: [0,       0.905, -0.106 ], size: [0.215, 0.090, 0.055] },
 ];
 
 // ─── Head zone colours ────────────────────────────────────────
@@ -106,26 +102,29 @@ function BodyZone({ zone, active, onTap }) {
 // ─── Head zone ────────────────────────────────────────────────
 function HeadZone({ zone, selected, onToggle, onHover }) {
   const color = ZONE_COLORS[zone.id] || "#7C3AED";
+  const r = Math.min(...zone.size) * 0.32;
   const handlers = useTapHandler(() => {
     onToggle(zone.id);
     onHover(zone.id);
   });
   return (
-    <mesh
+    <RoundedBox
       position={zone.pos}
+      args={zone.size}
+      radius={r}
+      smoothness={4}
       {...handlers}
       onPointerEnter={() => onHover(zone.id)}
       onPointerLeave={() => onHover(null)}
     >
-      <boxGeometry args={zone.size} />
       <meshStandardMaterial
         color={color}
         transparent
-        opacity={selected ? 0.65 : 0.32}
+        opacity={selected ? 0.68 : 0.38}
         depthWrite={false}
         side={THREE.DoubleSide}
       />
-    </mesh>
+    </RoundedBox>
   );
 }
 
