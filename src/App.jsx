@@ -2026,7 +2026,12 @@ export default function App() {
   const goNext = () => {
     // After IntensitySlider (step 5): non-same patterns jump to timeline
     if (step === 5 && painPattern && painPattern !== "same") {
-      setTimelineEvents(attachIds(buildInitialNodes(painPattern, currentEntry.intensity)));
+      const baseNodes = buildInitialNodes(painPattern, currentEntry.intensity).map(n => ({
+        ...n,
+        location: currentEntry.location,
+        painTypes: currentEntry.painTypes,
+      }));
+      setTimelineEvents(attachIds(baseNodes));
       setStep(20);
     } else {
       setStep(p => p + 1);
