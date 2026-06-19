@@ -905,40 +905,6 @@ function EntryBlock({ entry, index, t, totalEntries, dateLabel }) {
         </div>
       </div>
 
-      {painTypes?.length > 0 && (
-        <div style={{
-          backgroundColor: "#F5F3FF", borderRadius: "16px",
-          padding: "16px", border: "1.5px solid #DDD6FE",
-        }}>
-          <div style={{ fontSize: "12px", color: "#7C3AED", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: "12px" }}>
-            💬 {t.expressionTitle}
-          </div>
-          {painTypes.map(pt => {
-            const expr = t.medicalExpressions?.[pt];
-            if (!expr) return null;
-            return (
-              <div key={pt} style={{ marginBottom: "12px" }}>
-                <div style={{ backgroundColor: "#EDE9FE", borderRadius: "10px", padding: "10px 14px", marginBottom: "8px" }}>
-                  <div style={{ fontSize: "11px", color: "#7C3AED", fontWeight: "600", marginBottom: "4px" }}>
-                    {t.medicalTerm}
-                  </div>
-                  <div style={{ fontSize: "14px", color: "#3B0764", fontWeight: "700" }}>
-                    {expr.medical}
-                  </div>
-                </div>
-                <div style={{ backgroundColor: "#fff", borderRadius: "10px", padding: "10px 14px", borderLeft: "4px solid #7C3AED" }}>
-                  <div style={{ fontSize: "11px", color: "#7C3AED", fontWeight: "600", marginBottom: "6px" }}>
-                    {t.koreanExpr}
-                  </div>
-                  <div style={{ fontSize: "14px", color: "#1F0A3C", lineHeight: "1.65" }}>
-                    "{expr.phrase(location?.includes("unknown") ? null : locationLabel)}"
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
     </div>
   );
 }
@@ -1168,15 +1134,18 @@ function SummaryCard({ entries, currentEntry, onConsent, onBack, painPattern, ti
             ))
         }
 
-        {/* "이렇게 표현해 보세요" — timeline mode: render once using currentEntry's pain types */}
-        {isTimelineMode && (() => {
-          const pts = currentEntry.painTypes || [];
-          const locLabel = currentEntry.location?.includes("unknown")
-            ? t.unknownArea
-            : currentEntry.location?.includes("all")
-              ? t.headAll
-              : (currentEntry.location?.map(k => t[k]).join(", ") || "—");
-          if (!pts.length) return null;
+        {/* "이렇게 표현해 보세요" — 모든 entry의 통증 유형을 모아 페이지 하단에 한 번만 렌더링 */}
+        {(() => {
+          const sourceEntries = isTimelineMode
+            ? [currentEntry]
+            : allEntries;
+          const allPainTypes = [...new Set(sourceEntries.flatMap(e => e.painTypes || []))];
+          const locLabel = isTimelineMode
+            ? (currentEntry.location?.includes("unknown") ? null
+                : currentEntry.location?.includes("all") ? t.headAll
+                : (currentEntry.location?.map(k => t[k]).join(", ") || null))
+            : null;
+          if (!allPainTypes.length) return null;
           return (
             <div style={{
               backgroundColor: "#F5F3FF", borderRadius: "16px",
@@ -1185,7 +1154,7 @@ function SummaryCard({ entries, currentEntry, onConsent, onBack, painPattern, ti
               <div style={{ fontSize: "12px", color: "#7C3AED", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: "12px" }}>
                 💬 {t.expressionTitle}
               </div>
-              {pts.map(pt => {
+              {allPainTypes.map(pt => {
                 const expr = t.medicalExpressions?.[pt];
                 if (!expr) return null;
                 return (
@@ -1196,7 +1165,7 @@ function SummaryCard({ entries, currentEntry, onConsent, onBack, painPattern, ti
                     </div>
                     <div style={{ backgroundColor: "#fff", borderRadius: "10px", padding: "10px 14px", borderLeft: "4px solid #7C3AED" }}>
                       <div style={{ fontSize: "11px", color: "#7C3AED", fontWeight: "600", marginBottom: "6px" }}>{t.koreanExpr}</div>
-                      <div style={{ fontSize: "14px", color: "#1F0A3C", lineHeight: "1.65" }}>"{expr.phrase(currentEntry.location?.includes("unknown") ? null : locLabel)}"</div>
+                      <div style={{ fontSize: "14px", color: "#1F0A3C", lineHeight: "1.65" }}>"{expr.phrase(locLabel)}"</div>
                     </div>
                   </div>
                 );
